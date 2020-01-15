@@ -1,0 +1,26 @@
+model,grade,body_type,engine_layout,displacement,transmission,drivetrain,price
+Type C,140T,3-Door Hatchback,I3,1.4L,5MT/6AT,FF,$22900
+Type C,100T,3-Door Hatchback,I3,1.0T,6MT/7DCT,FF,$26900
+Type C,120T,3-Door Hatchback,I3,1.2T,6MT/7DCT,FF,$30900
+Type C,150DT,3-Door Hatchback,I3,1.5DT,6MT/7DCT,FF,$28900
+Type C,140N,5-Door Hatchback,I3,1.4L,5MT/6AT,FF,$23900
+Type C,100T,5-Door Hatchback,I3,1.0T,6MT/7DCT,FF,$27900
+Type C,120T,5-Door Hatchback,I3,1.2T,6MT/7DCT,FF,$31900
+Type C,150DT,5-Door Hatchback,I3,1.5DT,6MT/7DCT,FF,$29900
+Type C-MS,Motorsport,3-Door Hatchback,I4,2.0T,7DCT,4WD,$45900
+Type D,120T,3-Door Hatchback,I3,1.2T,6MT/7DCT,FF,$32900
+Type D,150T,3-Door Hatchback,I3,1.5T,6MT/7DCT,FF/4WD,$35900
+Type D,180T,3-Door Hatchback,I4,1.8T,6MT/7DCT,FF/4WD,$40900
+Type D,150DT,3-Door Hatchback,I3,1.5T,6MT/7DCT,FF/4WD,$37900
+Type D,180DT,3-Door Hatchback,I4,1.8T,6MT/7DCT,FF/4WD,$41900
+Type D-MS,Motorsport,3-Door Hatchback,I4,2.5L,7DCT,4WD,$57900
+Type D,120T,5-Door Hatchback,I3,1.2T,6MT/7DCT,FF,$33900
+Type D,150T,5-Door Hatchback,I3,1.5T,6MT/7DCT,FF/4WD,$36900
+Type D,180T,5-Door Hatchback,I4,1.8T,6MT/7DCT,FF/4WD,$41900
+Type D,150DT,5-Door Hatchback,I3,1.5T,6MT/7DCT,FF/4WD,$38900
+Type D,180DT,5-Door Hatchback,I4,1.8T,6MT/7DCT,FF/4WD,$42900
+Type D,120T,Sedan,I3,1.2T,6MT/7DCT,FF,$33800
+Type D,150T,Sedan,I3,1.5T,6MT/7DCT,FF/4WD,$36800
+Type D,180T,Sedan,I4,1.8T,6MT/7DCT,FF/4WD,$40800
+Type D,150DT,Sedan,I3,1.5T,6MT/7DCT,FF/4WD,$38800
+Type D,180DT,Sedan,I4,1.8T,6MT/7DCT,FF/4WD,$42800
