@@ -204,11 +204,20 @@ class dealership:
         self.make = make
         self.address = address
         self.phone_number = phone_number
-    def __repr__(self)
+    def __repr__(self):
         return "{name}, your reliable {make} dealer located at {address}. Contact us at {phone_number} for more details about our latest deals.".format(name=self.name, make=self.make, address=self.address, phone_number=self.phone_number)
 
-
+class customer:
+    def __init__(self, name, location, driving_period, is_buyer):
+        self.name = name
+        self.driving_period = driving_period
+        self.location = location
+    def buy_car(self, vehicle):
+        pass
+        
 gr_supra_rz = Vehicle(2020, "Toyota", "GR Supra", "RZ", "3.0", "1540kg", "170g/km", "Red", "¥7,027,778")
+gr_yaris = Vehicle(2021, "Toyota", "GR Yaris", "GR-FOUR", "1.6", "1280kg", "N/A", "white", "¥3,690,000")
 print(gr_supra_rz)
+print(gr_yaris)
 supra_rz_jza80 = used_vehicle(1997, "Toyota", "Supra", "RZ", "3.0", "1570kg", "N/A", "Gray", "¥4,000,500", "mint", "140,500km")
 print(supra_rz_jza80)
