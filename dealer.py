@@ -13,12 +13,13 @@ class Vehicle:
         return "{year} {make} {model} {trim}, {displacement}, {weight}, {carbon_emission}, {color}, {price}.".format(year=self.year, make=self.make, model=self.model, trim=self.trim, displacement=self.displacement, weight=self.weight, carbon_emission=self.carbon_emission, color=self.color, price=self.price)
 
 class used_vehicle(Vehicle):
-    def __init__(self, year, make, model, trim, displacement, weight, carbon_emission, color, price, condition, mileage):
+    def __init__(self, year, make, model, trim, displacement, weight, carbon_emission, color, price, condition, mileage, owner):
         super().__init__(year, make, model, trim, displacement, weight, carbon_emission, color, price)
         self.condition = condition
         self.mileage = mileage
+        self.owner = owner
     def __repr__(self):
-        return "{year} {make} {model} {trim}, {displacement}, {weight}, {carbon_emission}, {color}, {price}, {condition}, {mileage}.".format(year=self.year, make=self.make, model=self.model, trim=self.trim, displacement=self.displacement, weight=self.weight, carbon_emission=self.carbon_emission, color=self.color, price=self.price, condition=self.condition, mileage=self.mileage)
+        return "{year} {make} {model} {trim}, {displacement}, {weight}, {carbon_emission}, {color}, {price}, {condition}, {mileage}, {owner}.".format(year=self.year, make=self.make, model=self.model, trim=self.trim, displacement=self.displacement, weight=self.weight, carbon_emission=self.carbon_emission, color=self.color, price=self.price, condition=self.condition, mileage=self.mileage, owner=self.owner)
 
 class warranty:
     def __init__(self, component, year, mileage):
@@ -107,23 +108,34 @@ class Insurance:
             price += 70000
         return price
 
-
 freight = 80000
 
-class Listing:
-    def __init__(self, Vehicle):
+class dealership:
+    def __init__(self, name, make, address, phone_number):
+        self.name = name
+        self.make = make
+        self.address = address
+        self.phone_number = phone_number
+    def __repr__(self):
+        return "{name}, your reliable {make} dealer located at {address}. Contact us at {phone_number} for more details about our latest deals.".format(name=self.name, make=self.make, address=self.address, phone_number=self.phone_number)
+
+class listing(dealership):
+    def __init__(self, name, make, address, phone_number, Vehicle):
+        super().__init__(name, make, address, phone_number)
         self.Vehicle = Vehicle
     def __repr__(self):
         return "%s." % (self.Vehicle)
 
-class Listing_used_vehicle:
-    def __init__(self, used_vehicle):
+class listing_used_vehicle(dealership):
+    def __init__(self, name, make, address, phone_number, used_vehicle):
+        super().__init__(name, make, address, phone_number)
         self.used_vehicle = used_vehicle
     def __repr__(self):
         return "%s." % (self.used_vehicle)
 
-class inventory:
-    def __init__(self):
+class inventory(dealership):
+    def __init__(self, name, make, address, phone_number):
+        super().__init__(name, make, address, phone_number)
         self.listings_vehicle = []
         self.listings_used_vehicle = []
     def add_listings(self, new_listing):
@@ -151,14 +163,16 @@ class part:
     def __repr__(self):
         return "{component} for {vehicle_for_use}, {status}, {price}.".format(component=self.component, vehicle_for_use=self.vehicle_for_use, status=self.status, price=self.price)
 
-class part_listing:
-    def __init__(self, part):
+class part_listing(dealership):
+    def __init__(self, name, make, address, phone_number, part):
+        super().__init__(name, make, address, phone_number)
         self.part = part
     def __repr__(self):
         return "%s." % (self.part)
 
-class warehouse:
-    def __init__(self):
+class warehouse(dealership):
+    def __init__(self, name, make, address, phone_number):
+        super().__init__(name, make, address, phone_number)
         self.stored_parts = []
     def store_parts(self, new_part):
         self.stored_parts.append(new_part)
@@ -173,7 +187,7 @@ class loan:
         self.apr = apr
         self.term = term
         self.down_payment_percentage = down_payment_percentage
-        price_to_pay = Vehicle.price.strip("¥,") + options.price.strip("¥,") + tax.environment_tax + tax.weight_tax + tax.displacement_tax + Insurance.policy_pricing + freight + pre_delivery_inspection
+        price_to_pay = int(Vehicle.price.strip("¥,")) + int(options.price.strip("¥,")) + int(tax.environment_tax) + float(tax.weight_tax) + int(tax.displacement_tax) + int(Insurance.policy_pricing) + int(freight + pre_delivery_inspection)
     def down_payment(self, price_to_pay):
         dp = self.down_payment_percentage * price_to_pay 
         return dp
@@ -187,7 +201,7 @@ class lease:
         self.term = term
         self.down_payment_percentage = down_payment_percentage
         self.residual_value_percentage = residual_value_percentage
-        price_to_pay = Vehicle.price.strip("¥,") + options.price.strip("¥,") + tax.environment_tax + tax.weight_tax + tax.displacement_tax + Insurance.policy_pricing + freight + pre_delivery_inspection
+        price_to_pay = int(Vehicle.price.strip("¥,")) + int(options.price.strip("¥,")) + int(tax.environment_tax) + float(tax.weight_tax) + int(tax.displacement_tax) + int(Insurance.policy_pricing) + int(freight + pre_delivery_inspection)
     def down_payment(self, price_to_pay):
         dp = self.down_payment_percentage * price_to_pay
         return dp
@@ -198,26 +212,88 @@ class lease:
         mp = (price_to_pay * ((1 + apr) ** (term / 12)) - down_payment - residual_value) / term
         return mp
 
-class dealership:
-    def __init__(self, name, make, address, phone_number):
-        self.name = name
-        self.make = make
-        self.address = address
-        self.phone_number = phone_number
+class promos:
+    def __init__(self, discount, new_lease_apr, new_loan_apr, term, vehicle_applied, promotion_end_date):
+        self.discount = discount
+        self.new_lease_apr = new_lease_apr
+        self.new_loan_apr = new_loan_apr
+        self.term = term
+        self.vehicle_applied = vehicle_applied
+        self.promotion_end_date = promotion_end_date
     def __repr__(self):
-        return "{name}, your reliable {make} dealer located at {address}. Contact us at {phone_number} for more details about our latest deals.".format(name=self.name, make=self.make, address=self.address, phone_number=self.phone_number)
-
+        if discount > 0:
+            return "Buying {vehicle_applied} by {promotion_end_date}, you will be getting a {discount} of discount.".format(vehicle_applied=self.vehicle_applied, promotion_end_date=self.promotion_end_date, discount=self.discount)
+        if (new_lease_apr > 0) and (new_lease_apr < lease.apr):
+            return "Buying {vehicle_applied} by {promotion_end_date}, you can lease your vehicle with a rate of {new_lease_apr} for {term} months.".format(vehicle_applied=self.vehicle_applied, promotion_end_date=self.promotion_end_date, new_lease_apr=self.new_lease_apr, installments=self.installments)
+        if (new_loan_apr > 0) and (new_loan_apr < loan.apr):
+            return "Buying {vehicle_applied} by {promotion_end_date}, you can finance your vehicle with a rate of {new_loan_apr} for {term} months.".format(vehicle_applied=self.vehicle_applied, promotion_end_date=self.promotion_end_date, new_loan_apr=self.new_loan_apr, installments=self.installments)
+    def application(self, discount, new_lease_apr, new_loan_apr):
+        if discount > 0:
+            price_to_pay_promo = price_to_pay - discount
+        if (new_lease_apr > 0) and (new_lease_apr < lease.apr):
+            lease.apr = new_lease_apr
+            lease.term = term
+        if (new_loan_apr > 0) and (new_loan_apr < loan.apr):
+            loan.apr = new_loan_apr
+            loan.term = term
+        
 class customer:
-    def __init__(self, name, location, driving_period, is_buyer):
+    def __init__(self, name, driving_period, is_buyer, is_seller, make_inquiry, model_inquiry, budget):
         self.name = name
         self.driving_period = driving_period
-        self.location = location
-    def buy_car(self, vehicle):
-        pass
-        
+        self.make_inquiry = make_inquiry
+        self.model_inquiry = model_inquiry
+        self.budget = budget
+        self.is_buyer = is_buyer
+        self.is_seller = is_seller
+        if is_buyer:
+            pass
+        elif is_seller:
+            pass
+        else:
+            print("Visitor.")
+            print("Ask us if you need help.")
+    def buy_car(self, listing, model_inquiry, budget):
+        for listing in inventory.listings_vehicle:
+            print(listing)
+        if model_inquiry not in inventory.listings_vehicle.Vehicle.model:
+            print("I'm afraid we cannot process your request. Please pick a model.")
+        elif budget.strip("¥,") < inventory.listings_vehicle.Vehicle.price.strip("¥,"):
+            listings_vehicle_under_budget = [listing for listing in listings_vehicle if budget.strip("¥,") < inventory.listings_vehicle.Vehicle.price.strip("¥,")]
+            for listing in listings_vehicle_under_budget:
+                print(listing)
+        else:
+            inventory.remove_listings()
+    def buy_used_car(self, listing, make_inquiry, model_inquiry, budget):
+        for listing in inventory.listings_used_vehicle:
+            print(listing)
+        if make_inquiry not in inventory.listings_used_vehicle.used_vehicle.make:
+            print("We do not have the brand requested in stock. Please make another choice or check back later.")
+        elif model_inquiry not in inventory.listings_used_vehicle.used_vehicle.model:
+            print("We do not have the model requested in stock. Please make another choice or check back later.")
+        elif budget.strip("¥,") < inventory.listings_used_vehicle.used_vehicle.price.strip("¥,"):
+            listings_used_vehicle_under_budget = [listing for listing in listings_used_vehicle if budget.strip("¥,") < inventory.listings_used_vehicle.used_vehicle.price.strip("¥,")]
+            for listing in listings_used_vehicle_under_budget:
+                print(listing)
+        elif dealership.name not in inventory.listing_used_vehicle.used_vehicle.owner:
+            print("We do not have this model in stock. Please go to another dealership or check back later.")
+        else:
+            inventory.remove_used_listings()
+    def sell_car(self, used_vehicle, price):
+        if used_vehicle.owner == self:
+            new_used_listing = listing_used_vehicle(used_vehicle)
+            inventory.add_used_listings(new_used_listing)
+
+class service:
+
+
 gr_supra_rz = Vehicle(2020, "Toyota", "GR Supra", "RZ", "3.0", "1540kg", "170g/km", "Red", "¥7,027,778")
-gr_yaris = Vehicle(2021, "Toyota", "GR Yaris", "GR-FOUR", "1.6", "1280kg", "N/A", "white", "¥3,690,000")
+gr_yaris = Vehicle(2021, "Toyota", "GR Yaris", "GR-FOUR", "1.6", "1280kg", "N/A", "White", "¥3,690,000")
+corolla_sport_hybrid_g = Vehicle(2020, "Toyota", "Corolla Sport", "Hybrid G", "1.8", "1400kg", "83g/km", "White", "¥2,659,800")
+sngwngtd = dealership("Toyota Mobility Tokyo Shinagawa Nishi Gotanda", "Toyota", "8-11-18 Nishi-Gotanda, Shinagawa, Tokyo, Tokyo, Japan 141-0031", "+81-3-3491-0141")
+print(sngwngtd)
 print(gr_supra_rz)
 print(gr_yaris)
-supra_rz_jza80 = used_vehicle(1997, "Toyota", "Supra", "RZ", "3.0", "1570kg", "N/A", "Gray", "¥4,000,500", "mint", "140,500km")
+print(corolla_sport_hybrid_g)
+supra_rz_jza80 = used_vehicle(1997, "Toyota", "Supra", "RZ", "3.0", "1570kg", "N/A", "Gray", "¥4,000,500", "mint", "140,500km", "Toyota Mobility Tokyo Shinagawa Nishi Gotanda")
 print(supra_rz_jza80)
