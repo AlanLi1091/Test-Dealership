@@ -236,23 +236,38 @@ class promos:
         if (new_loan_apr > 0) and (new_loan_apr < loan.apr):
             loan.apr = new_loan_apr
             loan.term = term
-        
+
 class customer:
-    def __init__(self, name, driving_period, is_buyer, is_seller, make_inquiry, model_inquiry, budget):
+    def __init__(self, name, is_buyer, is_seller, need_service):
         self.name = name
-        self.driving_period = driving_period
-        self.make_inquiry = make_inquiry
-        self.model_inquiry = model_inquiry
-        self.budget = budget
         self.is_buyer = is_buyer
         self.is_seller = is_seller
+        self.need_service = need_service
         if is_buyer:
             pass
         elif is_seller:
             pass
+        elif need_service:
+            print("Our service personnels will help you out.")
         else:
             print("Visitor.")
             print("Ask us if you need help.")
+    def __repr__(self):
+        if is_buyer:
+            return "{name}, buying a vehicle.".format(name=self.name)
+        elif is_seller:
+            return "{name}, selling a vehicle.".format(name=self.name)
+        elif need_service:
+            return "{name}, requesting a service.".format(name=self.name)
+        else:
+            return "{name}, visiting today.".format(name=self.name)
+
+class buy_and_sell(customer):
+    def __init__(self, name, is_buyer, is_seller, need_service, make_inquiry, model_inquiry, budget):
+        super().__init__(name, is_buyer, is_seller, need_service)
+        self.make_inquiry = make_inquiry
+        self.model_inquiry = model_inquiry
+        self.budget = budget
     def buy_car(self, listing, model_inquiry, budget):
         for listing in inventory.listings_vehicle:
             print(listing)
@@ -284,8 +299,153 @@ class customer:
             new_used_listing = listing_used_vehicle(used_vehicle)
             inventory.add_used_listings(new_used_listing)
 
-class service:
+class service(customer):
+    def __init__(self, name, is_buyer, is_seller, need_service, mileage, serviced_before, previous_services, request):
+        super().__init__(name, is_buyer, is_seller, need_service)
+        self.mileage = mileage
+        self.serviced_before = serviced_before
+        if serviced_before is False:
+            print("This is the customer's first service")
+        self.previous_services = previous_services
+        self.request = request
+    def __repr__(self):
+        return "{name}, {request}.".format(name=self.name, request=self.request)
 
+class repair(service, customer):
+    def __init__(self, name, is_buyer, is_seller, need_service, mileage, serviced_before, previous_services, request, component_to_fix):
+        super().__init__(name, is_buyer, is_seller, need_service, mileage, serviced_before, previous_services, request)
+        self.component_to_fix = component_to_fix
+        self.human_hours = 0
+        self.price = 0
+    def body(self, part):
+        if (component_to_fix in warehouse.stored_parts == True):
+            if ("front bumper" in request == True) or ("rear bumper" in request == True):
+                human_hours += 5
+            if "door panel" in request == True:
+                human_hours += 6
+            if "windshield" in request == True:
+                human_hours += 4
+            if ("left window" in request == True) or ("right window" in request == True):
+                human_hours += 6
+            if ("wheel" in request == True):
+                human_hours += 3
+            if ("need to be scrapped" in request == True):
+                print("Sorry, we are unable to fix a totalled vehicle.")
+        else:
+            print("We need to preorder the part in order to fix your vehicle.")
+    def transmission(self, part):
+        if (component_to_fix in warehouse.stored_parts == True):
+            if ("gearbox" in request == True):
+                human_hours += 8
+            if ("clutch" in request == True):
+                human_hours += 6
+            if ("differential" in request == True):
+                human_hours += 6
+            if ("transmission fluid replacement" in request == True):
+                human_hours += 1.5
+            if ("synchronizers" in request == True):
+                human_hours += 6
+        else:
+            print("We need to preorder the part in order to fix your vehicle.")
+    def engine(self, part):
+        if (component_to_fix in warehouse.stored_parts == True):
+            if ("spark plug" in request == True):
+                human_hours += 1
+            if ("timing belt" in request == True):
+                human_hours += 1.5
+            if ("alternator" in request == True):
+                human_hours += 1
+            if ("air filter" in request == True):
+                human_hours += 1
+            if ("oil filter" in request == True):
+                human_hours += 1
+            if ("exhaust pipe" in reuqest == True):
+                human_hours += 4
+            if ("muffler" in request == True):
+                human_hours += 3 
+            if ("catalytic converter" in request == True):
+                human_hours += 3
+            else:
+                human_hours += 12
+                print("A engine swap is needed.")
+        else:
+            print("We need to preorder the part in order to fix your vehicle.")
+    def chassis(self, part):
+        if (component_to_fix in warehouse.stored_parts == True):
+            if ("brakes" in request == True):
+                human_hours += 4
+            if ("calipers" in request == True):
+                human_hours += 3
+            if ("suspension" in request == True):
+                human_hours += 6
+            if ("springs" in request == True):
+                human_hours += 3
+            if ("shock absorbers" in request == True):
+                human_hours += 4.5
+            if ("struts" in request == True):
+                human_hours += 5
+            if ("control arms" in request == True):
+                human_hours += 4
+            if ("sway bars" in request == True):
+                human_hours += 4
+        else:
+            print("We need to preorder the part in order to fix your vehicle.")
+    def interior(self, part):
+        if (component_to_fix in warehouse.stored_parts == True):
+            if ("seats" in request == True):
+                human_hours += 3
+            if ("dashboard" in request == True):
+                human_hours += 3
+            if ("infotainment system" in request == True):
+                human_hours += 5
+            if ("tpms" in request == True):
+                human_hours += 1.5
+            if ("air conditioning" in request == True):
+                human_hours += 3
+            if ("steering wheel" in request == True):
+                human_hours += 2
+            if ("sunroof" in request == True):
+                human_hours += 1.5
+        else:
+            print("We need to preorder the part in order to fix your vehicle.")
+        return human_hours
+    def price(self, part, human_hours):
+        price = part.price + 5500 * human_hours
+
+class maintenance(service, customer):
+    def __init__(self, name, is_buyer, is_seller, need_service, mileage, serviced_before, previous_services, request, mileage_before_service):
+        super().__init__(name, is_buyer, is_seller, need_service, mileage, serviced_before, previous_services, request)
+        self.mileage_before_service = mileage_before_service
+        self.price = 0
+        self.human_hours = 0
+    def oil_change(self, mileage_before_service):
+        if (int(mileage_before_service) / 6000 >= 1) and (int(mileage_before_service) % 6000 >= 0) and (int(mileage_before_service) % 6000 <= 5999):
+            price += part.price()
+            human_hours += 1
+    def brake_fluid_change(self, mileage_before_service):        
+        if (int(mileage_before_service) / 20000 >= 1) and (int(mileage_before_service) % 20000 >= 0) and (int(mileage_before_service) % 20000 <= 19999):
+            price += part.price()
+            human_hours += 1
+    def air_filter_change(self, mileage_before_service):
+        if (int(mileage_before_service) / 12000 >= 1) and (int(mileage_before_service) & 12000 >= 0) and (int(mileage_before_service) % 12000 <= 11999):
+            price += part.price()
+            human_hours += 0.5
+    def wheel_alignment(self, mileage_before_service):
+        if (int(mileage_before_service) / 70000 >= 1) and (int(mileage_before_service) % 70000 >= 0) and (int(mileage_before_service) % 70000 <= 69999):
+            price += part.price()
+            human_hours += 3
+    def brake_replacement(self, mileage_before_service):
+        if (int(mileage_before_service) / 60000 >= 1) and (int(mileage_before_service) % 60000 >= 0) and (int(mileage_before_service) % 60000 <= 59999):
+            price += part.price()
+            human_hours += 3
+    def engine_replacement(self, mileage_before_service):
+        if (int(mileage_before_service) / 200000 >= 1) and (int(mileage_before_service) % 200000 >= 0) and (int(mileage_before_service) % 200000 <= 199999):
+            price += part.price()
+            human_hours += 12
+    def engine_replacement(self, mileage_before_service):
+        if (int(mileage_before_service) / 120000 >= 1) and (int(mileage_before_service) % 120000 >= 0) and (int(mileage_before_service) % 120000 <= 119999):
+            price += part.price()
+            human_hours += 8
 
 gr_supra_rz = Vehicle(2020, "Toyota", "GR Supra", "RZ", "3.0", "1540kg", "170g/km", "Red", "¥7,027,778")
 gr_yaris = Vehicle(2021, "Toyota", "GR Yaris", "GR-FOUR", "1.6", "1280kg", "N/A", "White", "¥3,690,000")
