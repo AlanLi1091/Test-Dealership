@@ -312,9 +312,11 @@ class service(customer):
         return "{name}, {request}.".format(name=self.name, request=self.request)
 
 class repair(service, customer):
-    def __init__(self, name, is_buyer, is_seller, need_service, mileage, serviced_before, previous_services, request, component_to_fix):
+    def __init__(self, name, is_buyer, is_seller, need_service, mileage, serviced_before, previous_services, request, component_to_fix, purchase_date, repair_date):
         super().__init__(name, is_buyer, is_seller, need_service, mileage, serviced_before, previous_services, request)
         self.component_to_fix = component_to_fix
+        self.purchase_date = purchase_date
+        self.repair_date = repair_date
         self.human_hours = 0
         self.price = 0
     def body(self, part):
@@ -337,14 +339,19 @@ class repair(service, customer):
         if (component_to_fix in warehouse.stored_parts == True):
             if ("gearbox" in request == True):
                 human_hours += 8
-            if ("clutch" in request == True):
+            elif ("clutch" in request == True):
                 human_hours += 6
-            if ("differential" in request == True):
+            elif ("differential" in request == True):
                 human_hours += 6
-            if ("transmission fluid replacement" in request == True):
+            elif ("transmission fluid replacement" in request == True):
                 human_hours += 1.5
-            if ("synchronizers" in request == True):
+            elif ("synchronizers" in request == True):
                 human_hours += 6
+            else:
+                if (repair_date - purchase_date <= warranty.year) or (mileage <= warranty.mileage):
+                    part.price = 0
+                human_hours += 12
+                print("We need to swap a new transmission for you.")          
         else:
             print("We need to preorder the part in order to fix your vehicle.")
     def engine(self, part):
@@ -366,6 +373,8 @@ class repair(service, customer):
             if ("catalytic converter" in request == True):
                 human_hours += 3
             else:
+                if (repair_date - purchase_date <= warranty.year) or (mileage <= warranty.mileage):
+                    part.price = 0
                 human_hours += 12
                 print("A engine swap is needed.")
         else:
