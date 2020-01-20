@@ -455,14 +455,3 @@ class maintenance(service, customer):
         if (int(mileage_before_service) / 120000 >= 1) and (int(mileage_before_service) % 120000 >= 0) and (int(mileage_before_service) % 120000 <= 119999):
             price += part.price()
             human_hours += 8
-
-gr_supra_rz = Vehicle(2020, "Toyota", "GR Supra", "RZ", "3.0", "1540kg", "170g/km", "Red", "¥7,027,778")
-gr_yaris = Vehicle(2021, "Toyota", "GR Yaris", "GR-FOUR", "1.6", "1280kg", "N/A", "White", "¥3,690,000")
-corolla_sport_hybrid_g = Vehicle(2020, "Toyota", "Corolla Sport", "Hybrid G", "1.8", "1400kg", "83g/km", "White", "¥2,659,800")
-sngwngtd = dealership("Toyota Mobility Tokyo Shinagawa Nishi Gotanda", "Toyota", "8-11-18 Nishi-Gotanda, Shinagawa, Tokyo, Tokyo, Japan 141-0031", "+81-3-3491-0141")
-print(sngwngtd)
-print(gr_supra_rz)
-print(gr_yaris)
-print(corolla_sport_hybrid_g)
-supra_rz_jza80 = used_vehicle(1997, "Toyota", "Supra", "RZ", "3.0", "1570kg", "N/A", "Gray", "¥4,000,500", "mint", "140,500km", "Toyota Mobility Tokyo Shinagawa Nishi Gotanda")
-print(supra_rz_jza80)
