@@ -9,8 +9,58 @@ class vehicle:
         self.carbon_emission = carbon_emission
         self.color = color
         self.price = price
+        self.tax_amount = 0
     def __repr__(self):
         return "{year} {make} {model} {trim}, {displacement}, {weight}, {carbon_emission}, {color}, {price}.".format(year=self.year, make=self.make, model=self.model, trim=self.trim, displacement=self.displacement, weight=self.weight, carbon_emission=self.carbon_emission, color=self.color, price=self.price)
+    def environment_tax(self):
+        if self.carbon_emission != "N/A":
+            carbon_emission_value = int(self.carbon_emission.strip("g/km"))
+        if carbon_emission_value < 100:
+            self.et = 20000.0
+        if (carbon_emission_value >= 100) and (carbon_emission_value < 150):
+            self.et = 30000.0
+        if (carbon_emission_value >= 150) and (carbon_emission_value < 200):
+            self.et = 50000.0
+        if (carbon_emission_value >= 200) and (carbon_emission_value < 250):
+            self.et = 70000.0
+        if (carbon_emission_value >= 250) and (carbon_emission_value < 300):
+            self.et = 100000.0
+        if (carbon_emission_value >= 300):
+            self.et = 160000.0
+        return self.et
+    def weight_tax(self, price):
+        if self.weight != "N/A":
+            weight_value = int(self.weight.strip("kg"))
+        if weight_value < 700:
+            self.wt = float(self.price) * 0.005
+        if (weight_value >= 700 ) and (weight_value < 1200):
+            self.wt = float(self.price) * 0.007
+        if (weight_value >= 1200) and (weight_value < 1600):
+            self.wt = float(self.price) * 0.01
+        if (weight_value >= 1600) and (weight_value < 2000):
+            self.wt = float(self.price) * 0.015
+        if (weight_value >= 2000):
+            self.wt = float(self.price) * 0.025
+        return self.wt
+    def displacement_tax(self):
+        if float(self.displacement) < 0.7:
+            self.dt = 18000
+        if (float(self.displacement) >= 0.7) and (float(self.displacement) < 1.3):
+            self.dt = 27500
+        if (float(self.displacement) >= 1.3) and (float(self.displacement) < 2.0 ):
+            self.dt = 44500
+        if (float(self.displacement) >= 2.0 ) and (float(self.displacement) < 2.5 ):
+            self.dt = 64000
+        if (float(self.displacement) >= 2.5 ) and (float(self.displacement) < 3.0 ):
+            self.dt = 90000
+        if (float(self.displacement) >= 3.0 ) and (float(self.displacement) < 4.0 ):
+            self.dt = 128000
+        if (float(self.displacement) >= 4.0 ):
+            self.dt = 210000  
+        return self.dt
+    def total_tax_amount(self):
+        self.tax_amount = self.et + self.wt + self.dt
+        return self.tax_amount
 
 class used_vehicle(vehicle):
     def __init__(self, year, make, model, trim, displacement, weight, carbon_emission, color, price, condition, mileage, owner):
@@ -35,55 +85,7 @@ class options:
         self.vehicle_for_use = vehicle_for_use
         self.price = price
     def __repr__(self):
-        return "{name} for {vehicle_for_use}, {price}.".format(name=self.name, vehicle_for_use=self.vehicle_for_use, price=self.price)
-
-class tax(vehicle):
-    def environment_tax(self):
-        if vehicle.carbon_emission != "N/A":
-            carbon_emission_value = vehicle.carbon_emission.strip("g/km")
-        if carbon_emission_value < 100:
-            et = 20000
-        if ( carbon_emission_value >= 100 ) and ( carbon_emission_value < 150 ):
-            et = 30000
-        if ( carbon_emission_value >= 150 ) and ( carbon_emission_value < 200 ):
-            et = 50000
-        if ( carbon_emission_value >= 200 ) and ( carbon_emission_value < 250 ):
-            et = 70000
-        if ( carbon_emission_value >= 250 ) and ( carbon_emission_value < 300 ):
-            et = 100000
-        if ( carbon_emission_value >= 300 ):
-            et = 160000
-        return et
-    def weight_tax(self, price):
-        if vehicle.weight != "N/A":
-            weight_value = vehicle.weight.strip("kg")
-        if weight_value < 700:
-            wt = vehicle.price * 0.005
-        if ( weight_value >= 700 ) and ( weight_value < 1200 ):
-            wt = vehicle.price * 0.007
-        if ( weight_value >= 1200 ) and ( weight_value < 1600 ):
-            wt = vehicle.price * 0.01
-        if ( weight_value >= 1600 ) and ( weight_value < 2000 ):
-            wt = vehicle.price * 0.015
-        if ( weight_value >= 2000 ):
-            wt = vehicle.price * 0.025
-        return wt
-    def displacement_tax(self):
-        if vehicle.displacement < 0.7:
-            dt = 18000
-        if ( vehicle.displacement >= 0.7 ) and ( vehicle.displacement < 1.3 ):
-            dt = 27500
-        if ( vehicle.displacement >= 1.3 ) and ( vehicle.displacement < 2.0 ):
-            dt = 44500
-        if ( vehicle.displacement >= 2.0 ) and ( vehicle.displacement < 2.5 ):
-            dt = 64000
-        if ( vehicle.displacement >= 2.5 ) and ( vehicle.displacement < 3.0 ):
-            dt = 90000
-        if ( vehicle.displacement >= 3.0 ) and ( vehicle.displacement < 4.0 ):
-            dt = 128000
-        if ( vehicle.displacement >= 4.0 ):
-            dt = 210000  
-        return dt              
+        return "{name} for {vehicle_for_use}, {price}.".format(name=self.name, vehicle_for_use=self.vehicle_for_use, price=self.price)                  
 
 class insurance:
     def __init__(self, comprehensive_coverage, third_party_liability, collision, deductable, pedestrian_injury):
@@ -190,7 +192,7 @@ class loan:
         dp = self.down_payment_percentage * price_to_pay 
         return dp
     def monthly_installments(self, apr, term, price_to_pay):
-        mi = (price_to_pay * ((1 + apr) ** (term / 12)) - self.dp) / term
+        mi = (price_to_pay * ((1 + apr) ** (term / 12)) - dp) / term
         return mi
 
 class lease:
@@ -201,14 +203,14 @@ class lease:
         self.residual_value_percentage = residual_value_percentage
         price_to_pay = int(vehicle.price.strip("¥")) + int(options.price.strip("¥")) + int(tax.environment_tax) + float(tax.weight_tax) + int(tax.displacement_tax) + int(insurance.policy_pricing) + int(freight + pre_delivery_inspection)
     def down_payment(self, price_to_pay):
-        dp = self.down_payment_percentage * price_to_pay
-        return dp
+        self.dp = self.down_payment_percentage * price_to_pay
+        return self.dp
     def residual_value(self, price_to_pay):
-        rv = self.residual_value_percentage * price_to_pay
-        return rv
+        self.rv = self.residual_value_percentage * price_to_pay
+        return self.rv
     def monthly_payment(self, apr, term, price_to_pay):
-        mp = (price_to_pay * ((1 + apr) ** (term / 12)) - dp - rv) / term
-        return mp
+        self.mp = (price_to_pay * ((1 + apr) ** (term / 12)) - self.dp - self.rv) / term
+        return self.mp
 
 class promos:
     def __init__(self, discount, new_lease_apr, new_loan_apr, term, vehicle_applied, promotion_end_date):
@@ -276,7 +278,7 @@ class buy_and_sell(customer):
             inventory.remove_used_listings()
     def sell_car(self, used_vehicle, price):
         if used_vehicle.owner == self:
-            new_used_listing = listing_used_vehicle(used_vehicle)
+            new_used_listing = inventory.listing_used_vehicle(used_vehicle)
             inventory.add_used_listings(new_used_listing)
 
 class service(customer):
@@ -363,44 +365,44 @@ class repair(service, customer):
     def chassis(self, part):
         if (self.component_to_fix in warehouse.stored_parts == True):
             if ("brakes" in self.request == True):
-                self.human_hours += 4
+                self.human_hours += 4.0
             if ("calipers" in self.request == True):
-                self.human_hours += 3
+                self.human_hours += 3.0
             if ("suspension" in self.request == True):
-                self.human_hours += 6
+                self.human_hours += 6.0
             if ("springs" in self.request == True):
-                self.human_hours += 3
+                self.human_hours += 3.0
             if ("shock absorbers" in self.request == True):
                 self.human_hours += 4.5
             if ("struts" in self.request == True):
-                self.human_hours += 5
+                self.human_hours += 5.0
             if ("control arms" in self.request == True):
-                self.human_hours += 4
+                self.human_hours += 4.0
             if ("sway bars" in self.request == True):
-                self.human_hours += 4
+                self.human_hours += 4.0
         else:
             print("We need to preorder the part in order to fix your vehicle.")
     def interior(self, part):
         if (self.component_to_fix in warehouse.stored_parts == True):
             if ("seats" in self.request == True):
-                self.human_hours += 3
+                self.human_hours += 3.0
             if ("dashboard" in self.request == True):
-                self.human_hours += 3
+                self.human_hours += 3.0
             if ("infotainment system" in self.request == True):
                 self.human_hours += 5
-            if ("tpms" in request == True):
+            if ("tpms" in self.request == True):
                 self.human_hours += 1.5
             if ("air conditioning" in self.request == True):
-                self.human_hours += 3
+                self.human_hours += 3.0
             if ("steering wheel" in self.request == True):
-                self.human_hours += 2
+                self.human_hours += 2.0
             if ("sunroof" in self.request == True):
                 self.human_hours += 1.5
         else:
             print("We need to preorder the part in order to fix your vehicle.")
         return self.human_hours
     def final_pricing(self, part, human_hours):
-        price = part.price + 5500 * human_hours
+        price = part.price + 5500.0 * human_hours
 
 class maintenance(service, customer):
     def __init__(self, name, request_at_the_desk, mileage, serviced_before, previous_services, request, mileage_before_service):

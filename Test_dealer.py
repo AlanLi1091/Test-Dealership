@@ -1,5 +1,5 @@
 import unittest
-from dealer import Vehicle
+from dealer import vehicle
 from dealer import tax
 
 test_car = vehicle("2020", "Toyota", "GR Supra", "RZ", str(3.0), "1540kg", "170g/km", "Red", "¥7027778")
