@@ -1,4 +1,4 @@
-class Vehicle:
+class vehicle:
     def __init__(self, year, make, model, trim, displacement, weight, carbon_emission, color, price):
         self.year = year
         self.make = make
@@ -12,7 +12,7 @@ class Vehicle:
     def __repr__(self):
         return "{year} {make} {model} {trim}, {displacement}, {weight}, {carbon_emission}, {color}, {price}.".format(year=self.year, make=self.make, model=self.model, trim=self.trim, displacement=self.displacement, weight=self.weight, carbon_emission=self.carbon_emission, color=self.color, price=self.price)
 
-class used_vehicle(Vehicle):
+class used_vehicle(vehicle):
     def __init__(self, year, make, model, trim, displacement, weight, carbon_emission, color, price, condition, mileage, owner):
         super().__init__(year, make, model, trim, displacement, weight, carbon_emission, color, price)
         self.condition = condition
@@ -37,12 +37,10 @@ class options:
     def __repr__(self):
         return "{name} for {vehicle_for_use}, {price}.".format(name=self.name, vehicle_for_use=self.vehicle_for_use, price=self.price)
 
-class tax:
-    def __init__(self, price):
-        self.price = Vehicle.price.strip("¥")
+class tax(vehicle):
     def environment_tax(self):
-        if Vehicle.carbon_emission != "N/A":
-            carbon_emission_value = Vehicle.carbon_emission.strip("g/km")
+        if vehicle.carbon_emission != "N/A":
+            carbon_emission_value = vehicle.carbon_emission.strip("g/km")
         if carbon_emission_value < 100:
             et = 20000
         if ( carbon_emission_value >= 100 ) and ( carbon_emission_value < 150 ):
@@ -57,56 +55,56 @@ class tax:
             et = 160000
         return et
     def weight_tax(self, price):
-        if Vehicle.weight != "N/A":
-            weight_value = Vehicle.weight.strip("kg")
+        if vehicle.weight != "N/A":
+            weight_value = vehicle.weight.strip("kg")
         if weight_value < 700:
-            wt = Vehicle.price * 0.005
+            wt = vehicle.price * 0.005
         if ( weight_value >= 700 ) and ( weight_value < 1200 ):
-            wt = Vehicle.price * 0.007
+            wt = vehicle.price * 0.007
         if ( weight_value >= 1200 ) and ( weight_value < 1600 ):
-            wt = Vehicle.price * 0.01
+            wt = vehicle.price * 0.01
         if ( weight_value >= 1600 ) and ( weight_value < 2000 ):
-            wt = Vehicle.price * 0.015
+            wt = vehicle.price * 0.015
         if ( weight_value >= 2000 ):
-            wt = Vehicle.price * 0.025
+            wt = vehicle.price * 0.025
         return wt
     def displacement_tax(self):
-        if Vehicle.displacement < 0.7:
+        if vehicle.displacement < 0.7:
             dt = 18000
-        if ( Vehicle.displacement >= 0.7 ) and ( Vehicle.displacement < 1.3 ):
+        if ( vehicle.displacement >= 0.7 ) and ( vehicle.displacement < 1.3 ):
             dt = 27500
-        if ( Vehicle.displacement >= 1.3 ) and ( Vehicle.displacement < 2.0 ):
+        if ( vehicle.displacement >= 1.3 ) and ( vehicle.displacement < 2.0 ):
             dt = 44500
-        if ( Vehicle.displacement >= 2.0 ) and ( Vehicle.displacement < 2.5 ):
+        if ( vehicle.displacement >= 2.0 ) and ( vehicle.displacement < 2.5 ):
             dt = 64000
-        if ( Vehicle.displacement >= 2.5 ) and ( Vehicle.displacement < 3.0 ):
+        if ( vehicle.displacement >= 2.5 ) and ( vehicle.displacement < 3.0 ):
             dt = 90000
-        if ( Vehicle.displacement >= 3.0 ) and ( Vehicle.displacement < 4.0 ):
+        if ( vehicle.displacement >= 3.0 ) and ( vehicle.displacement < 4.0 ):
             dt = 128000
-        if ( Vehicle.displacement >= 4.0 ):
+        if ( vehicle.displacement >= 4.0 ):
             dt = 210000  
         return dt              
 
-class Insurance:
+class insurance:
     def __init__(self, comprehensive_coverage, third_party_liability, collision, deductable, pedestrian_injury):
         self.comprehensive_coverage = comprehensive_coverage
         self.third_party_liability = third_party_liability
         self.collision = collision
         self.deductable = deductable
-        self.pedestrian_injury = injury
+        self.pedestrian_injury = pedestrian_injury
         self.price = 0
     def policy_pricing(self):
-        if comprehensive_coverage == True:
-            price += 20000
-        if third_party_liability == 100000000:
-            price += 60000
-        if third_party_liability == 200000000:
-            price += 80000
-        if collision == True:
-            price += 50000
-        if pedestrian_injury == True:
-            price += 70000
-        return price
+        if self.comprehensive_coverage == True:
+            self.price += 20000
+        if self.third_party_liability == 100000000:
+            self.price += 60000
+        if self.third_party_liability == 200000000:
+            self.price += 80000
+        if self.collision == True:
+            self.price += 50000
+        if self.pedestrian_injury == True:
+            self.price += 70000
+        return self.price
 
 freight = 80000
 
@@ -120,11 +118,11 @@ class dealership:
         return "{name}, your reliable {make} dealer located at {address}. Contact us at {phone_number} for more details about our latest deals.".format(name=self.name, make=self.make, address=self.address, phone_number=self.phone_number)
 
 class listing(dealership):
-    def __init__(self, name, make, address, phone_number, Vehicle):
+    def __init__(self, name, make, address, phone_number, vehicle):
         super().__init__(name, make, address, phone_number)
-        self.Vehicle = Vehicle
+        self.vehicle = vehicle
     def __repr__(self):
-        return "%s." % (self.Vehicle)
+        return "%s." % (self.vehicle)
 
 class listing_used_vehicle(dealership):
     def __init__(self, name, make, address, phone_number, used_vehicle):
@@ -147,9 +145,9 @@ class inventory(dealership):
     def remove_used_listings(self, sold_used_listing):
         self.listings_used_vehicle.remove(sold_used_listing)
     def show_listings(self):
-        for listing in listings_vehicle:
+        for listing in self.listings_vehicle:
             print(listing)
-        for listing in listings_used_vehicle:
+        for listing in self.listings_used_vehicle:
             print(listing)
 
 pre_delivery_inspection = 140000
@@ -179,7 +177,7 @@ class warehouse(dealership):
     def remove_parts(self, sold_part):
         self.stored_parts.remove(sold_part)
     def show_warehose(self):
-        for part in stored_parts:
+        for part in self.stored_parts:
             print(part)
 
 class loan:
@@ -187,12 +185,12 @@ class loan:
         self.apr = apr
         self.term = term
         self.down_payment_percentage = down_payment_percentage
-        price_to_pay = int(Vehicle.price.strip("¥")) + int(options.price.strip("¥")) + int(tax.environment_tax) + float(tax.weight_tax) + int(tax.displacement_tax) + int(Insurance.policy_pricing) + int(freight + pre_delivery_inspection)
+        price_to_pay = int(vehicle.price.strip("¥")) + int(options.price.strip("¥")) + int(tax.environment_tax) + float(tax.weight_tax) + int(tax.displacement_tax) + int(insurance.policy_pricing) + int(freight + pre_delivery_inspection)
     def down_payment(self, price_to_pay):
         dp = self.down_payment_percentage * price_to_pay 
         return dp
     def monthly_installments(self, apr, term, price_to_pay):
-        mi = (price_to_pay * ((1 + apr) ** (term / 12)) - down_payment) / term
+        mi = (price_to_pay * ((1 + apr) ** (term / 12)) - self.dp) / term
         return mi
 
 class lease:
@@ -201,7 +199,7 @@ class lease:
         self.term = term
         self.down_payment_percentage = down_payment_percentage
         self.residual_value_percentage = residual_value_percentage
-        price_to_pay = int(Vehicle.price.strip("¥")) + int(options.price.strip("¥")) + int(tax.environment_tax) + float(tax.weight_tax) + int(tax.displacement_tax) + int(Insurance.policy_pricing) + int(freight + pre_delivery_inspection)
+        price_to_pay = int(vehicle.price.strip("¥")) + int(options.price.strip("¥")) + int(tax.environment_tax) + float(tax.weight_tax) + int(tax.displacement_tax) + int(insurance.policy_pricing) + int(freight + pre_delivery_inspection)
     def down_payment(self, price_to_pay):
         dp = self.down_payment_percentage * price_to_pay
         return dp
@@ -209,7 +207,7 @@ class lease:
         rv = self.residual_value_percentage * price_to_pay
         return rv
     def monthly_payment(self, apr, term, price_to_pay):
-        mp = (price_to_pay * ((1 + apr) ** (term / 12)) - down_payment - residual_value) / term
+        mp = (price_to_pay * ((1 + apr) ** (term / 12)) - dp - rv) / term
         return mp
 
 class promos:
@@ -221,21 +219,21 @@ class promos:
         self.vehicle_applied = vehicle_applied
         self.promotion_end_date = promotion_end_date
     def __repr__(self):
-        if discount > 0:
+        if self.discount > 0:
             return "Buying {vehicle_applied} by {promotion_end_date}, you will be getting a {discount} of discount.".format(vehicle_applied=self.vehicle_applied, promotion_end_date=self.promotion_end_date, discount=self.discount)
-        if (new_lease_apr > 0) and (new_lease_apr < lease.apr):
+        if (self.new_lease_apr > 0) and (self.new_lease_apr < lease.apr):
             return "Buying {vehicle_applied} by {promotion_end_date}, you can lease your vehicle with a rate of {new_lease_apr} for {term} months.".format(vehicle_applied=self.vehicle_applied, promotion_end_date=self.promotion_end_date, new_lease_apr=self.new_lease_apr, installments=self.installments)
-        if (new_loan_apr > 0) and (new_loan_apr < loan.apr):
+        if (self.new_loan_apr > 0) and (self.new_loan_apr < loan.apr):
             return "Buying {vehicle_applied} by {promotion_end_date}, you can finance your vehicle with a rate of {new_loan_apr} for {term} months.".format(vehicle_applied=self.vehicle_applied, promotion_end_date=self.promotion_end_date, new_loan_apr=self.new_loan_apr, installments=self.installments)
     def application(self, discount, new_lease_apr, new_loan_apr):
-        if discount > 0:
-            price_to_pay_promo = price_to_pay - discount
+        if self.discount > 0:
+            price_to_pay_promo = price_to_pay - self.discount
         if (new_lease_apr > 0) and (new_lease_apr < lease.apr):
             lease.apr = new_lease_apr
-            lease.term = term
+            lease.term = self.term
         if (new_loan_apr > 0) and (new_loan_apr < loan.apr):
             loan.apr = new_loan_apr
-            loan.term = term
+            loan.term = self.term
 
 class customer:
     def __init__(self, name, request_at_the_desk):
@@ -253,10 +251,10 @@ class buy_and_sell(customer):
     def buy_car(self, listing, model_inquiry, budget):
         for listing in inventory.listings_vehicle:
             print(listing)
-        if model_inquiry not in inventory.listings_vehicle.Vehicle.model:
+        if self.model_inquiry not in inventory.listings_vehicle.vehicle.model:
             print("I'm afraid we cannot process your request. Please pick a model.")
-        elif budget.strip("¥") < inventory.listings_vehicle.Vehicle.price.strip("¥"):
-            listings_vehicle_under_budget = [listing for listing in listings_vehicle if budget.strip("¥") < inventory.listings_vehicle.Vehicle.price.strip("¥")]
+        elif self.budget.strip("¥") < inventory.listings_vehicle.vehicle.price.strip("¥"):
+            listings_vehicle_under_budget = [listing for listing in listings_vehicle if budget.strip("¥") < inventory.listings_vehicle.vehicle.price.strip("¥")]
             for listing in listings_vehicle_under_budget:
                 print(listing)
         else:
@@ -303,105 +301,105 @@ class repair(service, customer):
         self.human_hours = 0
         self.price = 0
     def body(self, part):
-        if (component_to_fix in warehouse.stored_parts == True):
-            if ("front bumper" in request == True) or ("rear bumper" in request == True):
-                human_hours += 5
-            if "door panel" in request == True:
-                human_hours += 6
-            if "windshield" in request == True:
-                human_hours += 4
-            if ("left window" in request == True) or ("right window" in request == True):
-                human_hours += 6
-            if ("wheel" in request == True):
-                human_hours += 3
-            if ("need to be scrapped" in request == True):
+        if (self.component_to_fix in warehouse.stored_parts == True):
+            if ("front bumper" in self.request == True) or ("rear bumper" in self.request == True):
+                self.human_hours += 5.0
+            if "door panel" in self.request == True:
+                self.human_hours += 6.0
+            if "windshield" in self.request == True:
+                self.human_hours += 4.0
+            if ("left window" in self.request == True) or ("right window" in self.request == True):
+                self.human_hours += 6.0
+            if ("wheel" in self.request == True):
+                self.human_hours += 3.0
+            if ("need to be scrapped" in self.request == True):
                 print("Sorry, we are unable to fix a totalled vehicle.")
         else:
             print("We need to preorder the part in order to fix your vehicle.")
     def transmission(self, part):
-        if (component_to_fix in warehouse.stored_parts == True):
-            if ("gearbox" in request == True):
-                human_hours += 8
-            elif ("clutch" in request == True):
-                human_hours += 6
-            elif ("differential" in request == True):
-                human_hours += 6
-            elif ("transmission fluid replacement" in request == True):
-                human_hours += 1.5
-            elif ("synchronizers" in request == True):
-                human_hours += 6
+        if (self.component_to_fix in warehouse.stored_parts == True):
+            if ("gearbox" in self.request == True):
+                self.human_hours += 8.0
+            elif ("clutch" in self.request == True):
+                self.human_hours += 6.0
+            elif ("differential" in self.request == True):
+                self.human_hours += 6.0
+            elif ("transmission fluid replacement" in self.request == True):
+                self.human_hours += 1.5
+            elif ("synchronizers" in self.request == True):
+                self.human_hours += 6.0
             else:
-                if (repair_date - purchase_date <= warranty.year) or (mileage <= warranty.mileage):
+                if (self.repair_date - self.purchase_date <= warranty.year) or (self.mileage <= warranty.mileage):
                     part.price = 0
-                human_hours += 12
+                self.human_hours += 12.0
                 print("We need to swap a new transmission for you.")          
         else:
             print("We need to preorder the part in order to fix your vehicle.")
     def engine(self, part):
-        if (component_to_fix in warehouse.stored_parts == True):
-            if ("spark plug" in request == True):
-                human_hours += 1
-            if ("timing belt" in request == True):
-                human_hours += 1.5
-            if ("alternator" in request == True):
-                human_hours += 1
-            if ("air filter" in request == True):
-                human_hours += 1
-            if ("oil filter" in request == True):
-                human_hours += 1
-            if ("exhaust pipe" in reuqest == True):
-                human_hours += 4
-            if ("muffler" in request == True):
-                human_hours += 3 
-            if ("catalytic converter" in request == True):
-                human_hours += 3
+        if (self.component_to_fix in warehouse.stored_parts == True):
+            if ("spark plug" in self.request == True):
+                self.human_hours += 1.0
+            if ("timing belt" in self.request == True):
+                self.human_hours += 1.5
+            if ("alternator" in self.request == True):
+                self.human_hours += 1.0
+            if ("air filter" in self.request == True):
+                self.human_hours += 1.0
+            if ("oil filter" in self.request == True):
+                self.human_hours += 1.0
+            if ("exhaust pipe" in self.request == True):
+                self.human_hours += 4.0
+            if ("muffler" in self.request == True):
+                self.human_hours += 3.0
+            if ("catalytic converter" in self.request == True):
+                self.human_hours += 3.0
             else:
-                if (repair_date - purchase_date <= warranty.year) and (mileage <= warranty.mileage):
+                if (self.repair_date - self.purchase_date <= warranty.year) and (self.mileage <= warranty.mileage):
                     part.price = 0
-                human_hours += 12
+                self.human_hours += 12.0
                 print("A engine swap is needed.")
         else:
             print("We need to preorder the part in order to fix your vehicle.")
     def chassis(self, part):
-        if (component_to_fix in warehouse.stored_parts == True):
-            if ("brakes" in request == True):
-                human_hours += 4
-            if ("calipers" in request == True):
-                human_hours += 3
-            if ("suspension" in request == True):
-                human_hours += 6
-            if ("springs" in request == True):
-                human_hours += 3
-            if ("shock absorbers" in request == True):
-                human_hours += 4.5
-            if ("struts" in request == True):
-                human_hours += 5
-            if ("control arms" in request == True):
-                human_hours += 4
-            if ("sway bars" in request == True):
-                human_hours += 4
+        if (self.component_to_fix in warehouse.stored_parts == True):
+            if ("brakes" in self.request == True):
+                self.human_hours += 4
+            if ("calipers" in self.request == True):
+                self.human_hours += 3
+            if ("suspension" in self.request == True):
+                self.human_hours += 6
+            if ("springs" in self.request == True):
+                self.human_hours += 3
+            if ("shock absorbers" in self.request == True):
+                self.human_hours += 4.5
+            if ("struts" in self.request == True):
+                self.human_hours += 5
+            if ("control arms" in self.request == True):
+                self.human_hours += 4
+            if ("sway bars" in self.request == True):
+                self.human_hours += 4
         else:
             print("We need to preorder the part in order to fix your vehicle.")
     def interior(self, part):
-        if (component_to_fix in warehouse.stored_parts == True):
-            if ("seats" in request == True):
-                human_hours += 3
-            if ("dashboard" in request == True):
-                human_hours += 3
-            if ("infotainment system" in request == True):
-                human_hours += 5
+        if (self.component_to_fix in warehouse.stored_parts == True):
+            if ("seats" in self.request == True):
+                self.human_hours += 3
+            if ("dashboard" in self.request == True):
+                self.human_hours += 3
+            if ("infotainment system" in self.request == True):
+                self.human_hours += 5
             if ("tpms" in request == True):
-                human_hours += 1.5
-            if ("air conditioning" in request == True):
-                human_hours += 3
-            if ("steering wheel" in request == True):
-                human_hours += 2
-            if ("sunroof" in request == True):
-                human_hours += 1.5
+                self.human_hours += 1.5
+            if ("air conditioning" in self.request == True):
+                self.human_hours += 3
+            if ("steering wheel" in self.request == True):
+                self.human_hours += 2
+            if ("sunroof" in self.request == True):
+                self.human_hours += 1.5
         else:
             print("We need to preorder the part in order to fix your vehicle.")
-        return human_hours
-    def price(self, part, human_hours):
+        return self.human_hours
+    def final_pricing(self, part, human_hours):
         price = part.price + 5500 * human_hours
 
 class maintenance(service, customer):
@@ -412,34 +410,34 @@ class maintenance(service, customer):
         self.human_hours = 0
     def oil_change(self, mileage_before_service):
         if (int(mileage_before_service) / 6000 >= 1) and (int(mileage_before_service) % 6000 >= 0) and (int(mileage_before_service) % 6000 <= 5999):
-            price += part.price()
-            human_hours += 1
+            self.price += part.price()
+            self.human_hours += 1
     def brake_fluid_change(self, mileage_before_service):        
         if (int(mileage_before_service) / 20000 >= 1) and (int(mileage_before_service) % 20000 >= 0) and (int(mileage_before_service) % 20000 <= 19999):
-            price += part.price()
-            human_hours += 1
+            self.price += part.price()
+            self.human_hours += 1
     def air_filter_change(self, mileage_before_service):
         if (int(mileage_before_service) / 12000 >= 1) and (int(mileage_before_service) & 12000 >= 0) and (int(mileage_before_service) % 12000 <= 11999):
-            price += part.price()
-            human_hours += 0.5
+            self.price += part.price()
+            self.human_hours += 0.5
     def wheel_alignment(self, mileage_before_service):
         if (int(mileage_before_service) / 70000 >= 1) and (int(mileage_before_service) % 70000 >= 0) and (int(mileage_before_service) % 70000 <= 69999):
-            price += part.price()
-            human_hours += 3
+            self.price += part.price()
+            self.human_hours += 3
     def brake_replacement(self, mileage_before_service):
         if (int(mileage_before_service) / 60000 >= 1) and (int(mileage_before_service) % 60000 >= 0) and (int(mileage_before_service) % 60000 <= 59999):
-            price += part.price()
-            human_hours += 3
+            self.price += part.price()
+            self.human_hours += 3
     def engine_replacement(self, mileage_before_service):
         if (int(mileage_before_service) / 200000 >= 1) and (int(mileage_before_service) % 200000 >= 0) and (int(mileage_before_service) % 200000 <= 199999):
-            price += part.price()
-            human_hours += 12
-    def engine_replacement(self, mileage_before_service):
+            self.price += part.price()
+            self.human_hours += 12
+    def transmission_replacement(self, mileage_before_service):
         if (int(mileage_before_service) / 120000 >= 1) and (int(mileage_before_service) % 120000 >= 0) and (int(mileage_before_service) % 120000 <= 119999):
-            price += part.price()
-            human_hours += 8
+            self.price += part.price()
+            self.human_hours += 8
 
-#gr_supra_rz = Vehicle("2020", "Toyota", "GR Supra", "RZ", str(3.0), "1540kg", "170g/km", "Red", "¥7027778")
+#gr_supra_rz = vehicle("2020", "Toyota", "GR Supra", "RZ", str(3.0), "1540kg", "170g/km", "Red", "¥7027778")
 #print(gr_supra_rz)
 #tm_chiyoda = dealership("Toyota Mobility Chiyoda", "Toyota", "2-1-4 Uchi-Kanda, Chiyoda, Tokyo, Tokyo 101-0047", "+81-3-3256-5351")
 #print(tm_chiyoda)
