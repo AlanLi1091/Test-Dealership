@@ -3,8 +3,8 @@ class Vehicle:
         self.year = year
         self.make = make
         self.model = model
-        self.displacement = displacement
         self.trim = trim
+        self.displacement = displacement
         self.weight = weight
         self.carbon_emission = carbon_emission
         self.color = color
@@ -27,7 +27,7 @@ class warranty:
         self.year = year
         self.mileage = mileage
     def __repr__(self):
-        return "For {Vehicle.make} {Vehicle.model}, the warranty for {component} is {year} or {mileage}.".format(Vehicle.make, Vehicle.model, component=self.component, year=self.year, mileage=self.mileage)
+        return "The warranty for {component} is {year} years or {mileage}, whichever comes earlier.".format(component=self.component, year=self.year, mileage=self.mileage)
 
 class options:
     def __init__(self, name, vehicle_for_use, price):
@@ -39,10 +39,10 @@ class options:
 
 class tax:
     def __init__(self, price):
-        self.price = Vehicle.price.strip("¥,")
+        self.price = Vehicle.price.strip("¥")
     def environment_tax(self):
         if Vehicle.carbon_emission != "N/A":
-            carbon_emission_value = Vehicle.carbon_emission.split("g/km")
+            carbon_emission_value = Vehicle.carbon_emission.strip("g/km")
         if carbon_emission_value < 100:
             et = 20000
         if ( carbon_emission_value >= 100 ) and ( carbon_emission_value < 150 ):
@@ -58,7 +58,7 @@ class tax:
         return et
     def weight_tax(self, price):
         if Vehicle.weight != "N/A":
-            weight_value = Vehicle.weight.split("kg")
+            weight_value = Vehicle.weight.strip("kg")
         if weight_value < 700:
             wt = price * 0.005
         if ( weight_value >= 700 ) and ( weight_value < 1200 ):
@@ -155,13 +155,13 @@ class inventory(dealership):
 pre_delivery_inspection = 140000
 
 class part:
-    def __init__(self, component, vehicle_for_use, status, price):
+    def __init__(self, component, vehicle_used, status, price):
         self.component = component
-        self.vehicle_used = vehicle_for_use
+        self.vehicle_used = vehicle_used
         self.status = status
         self.price = price
     def __repr__(self):
-        return "{component} for {vehicle_for_use}, {status}, {price}.".format(component=self.component, vehicle_for_use=self.vehicle_for_use, status=self.status, price=self.price)
+        return "{component} for {vehicle_used}, {status}, {price}.".format(component=self.component, vehicle_used=self.vehicle_used, status=self.status, price=self.price)
 
 class part_listing(dealership):
     def __init__(self, name, make, address, phone_number, part):
@@ -187,7 +187,7 @@ class loan:
         self.apr = apr
         self.term = term
         self.down_payment_percentage = down_payment_percentage
-        price_to_pay = int(Vehicle.price.strip("¥,")) + int(options.price.strip("¥,")) + int(tax.environment_tax) + float(tax.weight_tax) + int(tax.displacement_tax) + int(Insurance.policy_pricing) + int(freight + pre_delivery_inspection)
+        price_to_pay = int(Vehicle.price.strip("¥")) + int(options.price.strip("¥")) + int(tax.environment_tax) + float(tax.weight_tax) + int(tax.displacement_tax) + int(Insurance.policy_pricing) + int(freight + pre_delivery_inspection)
     def down_payment(self, price_to_pay):
         dp = self.down_payment_percentage * price_to_pay 
         return dp
@@ -201,7 +201,7 @@ class lease:
         self.term = term
         self.down_payment_percentage = down_payment_percentage
         self.residual_value_percentage = residual_value_percentage
-        price_to_pay = int(Vehicle.price.strip("¥,")) + int(options.price.strip("¥,")) + int(tax.environment_tax) + float(tax.weight_tax) + int(tax.displacement_tax) + int(Insurance.policy_pricing) + int(freight + pre_delivery_inspection)
+        price_to_pay = int(Vehicle.price.strip("¥")) + int(options.price.strip("¥")) + int(tax.environment_tax) + float(tax.weight_tax) + int(tax.displacement_tax) + int(Insurance.policy_pricing) + int(freight + pre_delivery_inspection)
     def down_payment(self, price_to_pay):
         dp = self.down_payment_percentage * price_to_pay
         return dp
@@ -238,33 +238,15 @@ class promos:
             loan.term = term
 
 class customer:
-    def __init__(self, name, is_buyer, is_seller, need_service):
+    def __init__(self, name, request_at_the_desk):
         self.name = name
-        self.is_buyer = is_buyer
-        self.is_seller = is_seller
-        self.need_service = need_service
-        if is_buyer:
-            pass
-        elif is_seller:
-            pass
-        elif need_service:
-            print("Our service personnels will help you out.")
-        else:
-            print("Visitor.")
-            print("Ask us if you need help.")
+        self.request_at_the_desk = request_at_the_desk
     def __repr__(self):
-        if is_buyer:
-            return "{name}, buying a vehicle.".format(name=self.name)
-        elif is_seller:
-            return "{name}, selling a vehicle.".format(name=self.name)
-        elif need_service:
-            return "{name}, requesting a service.".format(name=self.name)
-        else:
-            return "{name}, visiting today.".format(name=self.name)
+        return "{name}, {request_at_the_desk}.".format(name=self.name, request_at_the_desk=self.request_at_the_desk)
 
 class buy_and_sell(customer):
-    def __init__(self, name, is_buyer, is_seller, need_service, make_inquiry, model_inquiry, budget):
-        super().__init__(name, is_buyer, is_seller, need_service)
+    def __init__(self, name, request_at_the_desk, make_inquiry, model_inquiry, budget):
+        super().__init__(name, request_at_the_desk)
         self.make_inquiry = make_inquiry
         self.model_inquiry = model_inquiry
         self.budget = budget
@@ -273,8 +255,8 @@ class buy_and_sell(customer):
             print(listing)
         if model_inquiry not in inventory.listings_vehicle.Vehicle.model:
             print("I'm afraid we cannot process your request. Please pick a model.")
-        elif budget.strip("¥,") < inventory.listings_vehicle.Vehicle.price.strip("¥,"):
-            listings_vehicle_under_budget = [listing for listing in listings_vehicle if budget.strip("¥,") < inventory.listings_vehicle.Vehicle.price.strip("¥,")]
+        elif budget.strip("¥") < inventory.listings_vehicle.Vehicle.price.strip("¥"):
+            listings_vehicle_under_budget = [listing for listing in listings_vehicle if budget.strip("¥") < inventory.listings_vehicle.Vehicle.price.strip("¥")]
             for listing in listings_vehicle_under_budget:
                 print(listing)
         else:
@@ -286,8 +268,8 @@ class buy_and_sell(customer):
             print("We do not have the brand requested in stock. Please make another choice or check back later.")
         elif model_inquiry not in inventory.listings_used_vehicle.used_vehicle.model:
             print("We do not have the model requested in stock. Please make another choice or check back later.")
-        elif budget.strip("¥,") < inventory.listings_used_vehicle.used_vehicle.price.strip("¥,"):
-            listings_used_vehicle_under_budget = [listing for listing in listings_used_vehicle if budget.strip("¥,") < inventory.listings_used_vehicle.used_vehicle.price.strip("¥,")]
+        elif budget.strip("¥") < inventory.listings_used_vehicle.used_vehicle.price.strip("¥"):
+            listings_used_vehicle_under_budget = [listing for listing in listings_used_vehicle if budget.strip("¥") < inventory.listings_used_vehicle.used_vehicle.price.strip("¥")]
             for listing in listings_used_vehicle_under_budget:
                 print(listing)
         elif dealership.name not in inventory.listing_used_vehicle.used_vehicle.owner:
@@ -300,20 +282,21 @@ class buy_and_sell(customer):
             inventory.add_used_listings(new_used_listing)
 
 class service(customer):
-    def __init__(self, name, is_buyer, is_seller, need_service, mileage, serviced_before, previous_services, request):
-        super().__init__(name, is_buyer, is_seller, need_service)
+    def __init__(self, name, request_at_the_desk, mileage, serviced_before, previous_services, request):
+        super().__init__(name, request_at_the_desk)
         self.mileage = mileage
         self.serviced_before = serviced_before
-        if serviced_before is False:
-            print("This is the customer's first service")
         self.previous_services = previous_services
         self.request = request
+        if serviced_before == False:
+            previous_services = None
+            print("This is the customer's first service")
     def __repr__(self):
         return "{name}, {request}.".format(name=self.name, request=self.request)
 
 class repair(service, customer):
-    def __init__(self, name, is_buyer, is_seller, need_service, mileage, serviced_before, previous_services, request, component_to_fix, purchase_date, repair_date):
-        super().__init__(name, is_buyer, is_seller, need_service, mileage, serviced_before, previous_services, request)
+    def __init__(self, name, request_at_the_desk, mileage, serviced_before, previous_services, request, component_to_fix, purchase_date, repair_date):
+        super().__init__(name, request_at_the_desk, mileage, serviced_before, previous_services, request)
         self.component_to_fix = component_to_fix
         self.purchase_date = purchase_date
         self.repair_date = repair_date
@@ -373,7 +356,7 @@ class repair(service, customer):
             if ("catalytic converter" in request == True):
                 human_hours += 3
             else:
-                if (repair_date - purchase_date <= warranty.year) or (mileage <= warranty.mileage):
+                if (repair_date - purchase_date <= warranty.year) and (mileage <= warranty.mileage):
                     part.price = 0
                 human_hours += 12
                 print("A engine swap is needed.")
@@ -422,8 +405,8 @@ class repair(service, customer):
         price = part.price + 5500 * human_hours
 
 class maintenance(service, customer):
-    def __init__(self, name, is_buyer, is_seller, need_service, mileage, serviced_before, previous_services, request, mileage_before_service):
-        super().__init__(name, is_buyer, is_seller, need_service, mileage, serviced_before, previous_services, request)
+    def __init__(self, name, request_at_the_desk, mileage, serviced_before, previous_services, request, mileage_before_service):
+        super().__init__(name, request_at_the_desk, mileage, serviced_before, previous_services, request)
         self.mileage_before_service = mileage_before_service
         self.price = 0
         self.human_hours = 0
@@ -455,3 +438,18 @@ class maintenance(service, customer):
         if (int(mileage_before_service) / 120000 >= 1) and (int(mileage_before_service) % 120000 >= 0) and (int(mileage_before_service) % 120000 <= 119999):
             price += part.price()
             human_hours += 8
+
+#gr_supra_rz = Vehicle("2020", "Toyota", "GR Supra", "RZ", str(3.0), "1540kg", "170g/km", "Red", "¥7027778")
+#print(gr_supra_rz)
+#tm_chiyoda = dealership("Toyota Mobility Chiyoda", "Toyota", "2-1-4 Uchi-Kanda, Chiyoda, Tokyo, Tokyo 101-0047", "+81-3-3256-5351")
+#print(tm_chiyoda)
+#supra_jza80 = used_vehicle("1997", "Toyota", "Supra", "RZ", str(3.0), "1570kg", "N/A", "Silver", "¥4005000", "mint", "120000km", tm_chiyoda.name)
+#print(supra_jza80)
+#engine_warranty = warranty("engine", str(5), "100000km")
+#print(engine_warranty)
+#trunk_spoiler = options("GR Trunk Spoiler", "GR Supra", "¥220000")
+#print(trunk_spoiler)
+#forged_al_wheel = part("GR 19-in forged aluminium wheel", "GR Supra", "Stock", "¥704000")
+#print(forged_al_wheel)
+#kazu = customer("Kazuya", "buying a car")
+#print(kazu)
