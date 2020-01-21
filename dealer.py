@@ -60,15 +60,15 @@ class tax:
         if Vehicle.weight != "N/A":
             weight_value = Vehicle.weight.strip("kg")
         if weight_value < 700:
-            wt = price * 0.005
+            wt = Vehicle.price * 0.005
         if ( weight_value >= 700 ) and ( weight_value < 1200 ):
-            wt = price * 0.007
+            wt = Vehicle.price * 0.007
         if ( weight_value >= 1200 ) and ( weight_value < 1600 ):
-            wt = price * 0.01
+            wt = Vehicle.price * 0.01
         if ( weight_value >= 1600 ) and ( weight_value < 2000 ):
-            wt = price * 0.015
+            wt = Vehicle.price * 0.015
         if ( weight_value >= 2000 ):
-            wt = price * 0.025
+            wt = Vehicle.price * 0.025
         return wt
     def displacement_tax(self):
         if Vehicle.displacement < 0.7:

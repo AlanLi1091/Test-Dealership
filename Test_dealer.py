@@ -16,7 +16,7 @@ class Testtax(unittest.TestCase):
     
     def setUp(self):
         print('setUp')
-        self.tax = tax(car.price.strip('¥'))
+        self.tax = tax(test_car.price.strip('¥'))
     
     def tearDown(self):
         print('teardown\n')
