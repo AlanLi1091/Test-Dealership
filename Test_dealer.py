@@ -1,8 +1,8 @@
 import unittest
-from dealer import vehicle
-from dealer import tax
+from dealer import Vehicle
 
-test_car = vehicle("2020", "Toyota", "GR Supra", "RZ", str(3.0), "1540kg", "170g/km", "Red", "¥7027778")
+
+test_car = Vehicle("2020", "Toyota", "GR Supra", "RZ", str(3.0), "1540kg", "170g/km", "Red", "¥7027778")
 
 class Testtax(unittest.TestCase):
 
@@ -16,7 +16,7 @@ class Testtax(unittest.TestCase):
     
     def setUp(self):
         print('setUp')
-        self.tax = tax(test_car.price.strip('¥'))
+        
     
     def tearDown(self):
         print('teardown\n')
