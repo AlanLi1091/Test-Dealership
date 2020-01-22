@@ -138,6 +138,8 @@ class Finance:
             self.loan_apr = loan_apr
     def get_lease_apr(self):
         return self.lease_apr
+    def get_loan_apr(self):
+        return self.loan_apr
     def down_payment(self, total_price_with_options):
         if self.is_lease:
             self.dp = total_price_with_options * float(self.lease_down_pay_rate)
@@ -145,8 +147,7 @@ class Finance:
             self.dp = total_price_with_options * float(self.loan_down_pay_rate)
         return self.dp
     def monthly_installment(self, total_price_with_options):
-        if self.is_lease:
-            self.mi = (total_price_with_options)
+        pass
 
 class Promotions:
     def __init__(self, discount, new_lease_apr, new_loan_apr, term, vehicle_applied, promotion_end_date):
@@ -161,16 +162,17 @@ class Promotions:
             return "Buying {vehicle_applied} by {promotion_end_date}, you will be getting a {discount} of discount.".format(vehicle_applied=self.vehicle_applied, promotion_end_date=self.promotion_end_date, discount=self.discount)
         if (self.new_lease_apr > 0) and (self.new_lease_apr < Finance.get_lease_apr):
             return "Buying {vehicle_applied} by {promotion_end_date}, you can lease your vehicle with a rate of {new_lease_apr} for {term} months.".format(vehicle_applied=self.vehicle_applied, promotion_end_date=self.promotion_end_date, new_lease_apr=self.new_lease_apr, installments=self.installments)
-        if (self.new_loan_apr > 0) and (self.new_loan_apr < loan.apr):
+        if (self.new_loan_apr > 0) and (self.new_loan_apr < Finance.get_loan_apr):
             return "Buying {vehicle_applied} by {promotion_end_date}, you can finance your vehicle with a rate of {new_loan_apr} for {term} months.".format(vehicle_applied=self.vehicle_applied, promotion_end_date=self.promotion_end_date, new_loan_apr=self.new_loan_apr, installments=self.installments)
     def application(self, discount, new_lease_apr, new_loan_apr):
+        price_to_pay_promo = 0
         if self.discount > 0:
-            price_to_pay_promo = price_to_pay - self.discount
-        if (new_lease_apr > 0) and (new_lease_apr < lease.apr):
-            lease.apr = new_lease_apr
+            price_to_pay_promo = Pricing.price_addition - self.discount
+        if (self.new_lease_apr > 0) and (self.new_lease_apr < Finance.get_lease_apr):
+            Finance.get_lease_apr = self.new_lease_apr
             lease.term = self.term
-        if (new_loan_apr > 0) and (new_loan_apr < loan.apr):
-            loan.apr = new_loan_apr
+        if (self.new_loan_apr > 0) and (self.new_loan_apr < Finance.get_loan_apr):
+            Finance.get_loan_apr = self.new_loan_apr
             loan.term = self.term
 
 class Dealership:
