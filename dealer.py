@@ -1,4 +1,7 @@
-class vehicle:
+freight = 80000
+pre_delivery_inspection = 140000
+
+class Vehicle:
     def __init__(self, year, make, model, trim, displacement, weight, carbon_emission, color, price):
         self.year = year
         self.make = make
@@ -9,9 +12,9 @@ class vehicle:
         self.carbon_emission = carbon_emission
         self.color = color
         self.price = price
-        self.tax_amount = 0
+        self.tax_amount = 0.0
     def __repr__(self):
-        return "{year} {make} {model} {trim}, {displacement}, {weight}, {carbon_emission}, {color}, {price}.".format(year=self.year, make=self.make, model=self.model, trim=self.trim, displacement=self.displacement, weight=self.weight, carbon_emission=self.carbon_emission, color=self.color, price=self.price)
+        return "{year} {make} {model} {trim}, {displacement}, {weight}, {carbon_emission}, {color}, ¥{price}.".format(year=self.year, make=self.make, model=self.model, trim=self.trim, displacement=self.displacement, weight=self.weight, carbon_emission=self.carbon_emission, color=self.color, price=self.price)
     def environment_tax(self):
         if self.carbon_emission != "N/A":
             carbon_emission_value = int(self.carbon_emission.strip("g/km"))
@@ -44,50 +47,53 @@ class vehicle:
         return self.wt
     def displacement_tax(self):
         if float(self.displacement) < 0.7:
-            self.dt = 18000
+            self.dt = 18000.0
         if (float(self.displacement) >= 0.7) and (float(self.displacement) < 1.3):
-            self.dt = 27500
+            self.dt = 27500.0
         if (float(self.displacement) >= 1.3) and (float(self.displacement) < 2.0 ):
-            self.dt = 44500
+            self.dt = 44500.0
         if (float(self.displacement) >= 2.0 ) and (float(self.displacement) < 2.5 ):
-            self.dt = 64000
+            self.dt = 64000.0
         if (float(self.displacement) >= 2.5 ) and (float(self.displacement) < 3.0 ):
-            self.dt = 90000
+            self.dt = 90000.0
         if (float(self.displacement) >= 3.0 ) and (float(self.displacement) < 4.0 ):
-            self.dt = 128000
+            self.dt = 128000.0
         if (float(self.displacement) >= 4.0 ):
-            self.dt = 210000  
+            self.dt = 210000.0
         return self.dt
     def total_tax_amount(self):
         self.tax_amount = self.et + self.wt + self.dt
         return self.tax_amount
+    def total_price(self):
+        self.price_total = self.tax_amount + float(self.price) + float(freight) + float(pre_delivery_inspection)
+        return self.price_total
 
-class used_vehicle(vehicle):
+class UsedVehicle(Vehicle):
     def __init__(self, year, make, model, trim, displacement, weight, carbon_emission, color, price, condition, mileage, owner):
         super().__init__(year, make, model, trim, displacement, weight, carbon_emission, color, price)
         self.condition = condition
         self.mileage = mileage
         self.owner = owner
     def __repr__(self):
-        return "{year} {make} {model} {trim}, {displacement}, {weight}, {carbon_emission}, {color}, {price}, {condition}, {mileage}, {owner}.".format(year=self.year, make=self.make, model=self.model, trim=self.trim, displacement=self.displacement, weight=self.weight, carbon_emission=self.carbon_emission, color=self.color, price=self.price, condition=self.condition, mileage=self.mileage, owner=self.owner)
+        return "{year} {make} {model} {trim}, {displacement}, {weight}, {carbon_emission}, {color}, ¥{price}, {condition}, {mileage}, {owner}.".format(year=self.year, make=self.make, model=self.model, trim=self.trim, displacement=self.displacement, weight=self.weight, carbon_emission=self.carbon_emission, color=self.color, price=self.price, condition=self.condition, mileage=self.mileage, owner=self.owner)
 
-class warranty:
-    def __init__(self, component, year, mileage):
-        self.component = component
-        self.year = year
-        self.mileage = mileage
-    def __repr__(self):
-        return "The warranty for {component} is {year} years or {mileage}, whichever comes earlier.".format(component=self.component, year=self.year, mileage=self.mileage)
-
-class options:
+class Options:
     def __init__(self, name, vehicle_for_use, price):
         self.name = name
         self.vehicle_for_use = vehicle_for_use
         self.price = price
     def __repr__(self):
-        return "{name} for {vehicle_for_use}, {price}.".format(name=self.name, vehicle_for_use=self.vehicle_for_use, price=self.price)                  
+        return "{name} for {vehicle_for_use}, ¥{price}.".format(name=self.name, vehicle_for_use=self.vehicle_for_use, price=self.price)          
+    def get_price(self):
+        return self.price
 
-class insurance:
+class Pricing:
+    def price_addition(self):
+        self.total_price_with_options = Options.get_price + Vehicle.total_price
+        return self.total_price_with_options
+
+
+class Insurance:
     def __init__(self, comprehensive_coverage, third_party_liability, collision, deductable, pedestrian_injury):
         self.comprehensive_coverage = comprehensive_coverage
         self.third_party_liability = third_party_liability
@@ -97,20 +103,77 @@ class insurance:
         self.price = 0
     def policy_pricing(self):
         if self.comprehensive_coverage == True:
-            self.price += 20000
+            self.price += 20000.0
         if self.third_party_liability == 100000000:
-            self.price += 60000
+            self.price += 60000.0
         if self.third_party_liability == 200000000:
-            self.price += 80000
+            self.price += 80000.0
         if self.collision == True:
-            self.price += 50000
+            self.price += 50000.0
         if self.pedestrian_injury == True:
-            self.price += 70000
+            self.price += 70000.0
         return self.price
 
-freight = 80000
+class Warranty:
+    def __init__(self, component, year, mileage):
+        self.component = component
+        self.year = year
+        self.mileage = mileage
+    def __repr__(self):
+        return "The warranty for {component} is {year} years or {mileage}, whichever comes earlier.".format(component=self.component, year=self.year, mileage=self.mileage)
 
-class dealership:
+class Finance:
+    def __init__(self, is_lease, is_loan, lease_apr, loan_apr, lease_term, loan_term, lease_down_pay_rate, loan_down_pay_rate):
+        self.is_lease = is_lease
+        self.is_loan = is_loan
+        self.lease_apr = lease_apr
+        self.loan_apr = loan_apr
+        self.lease_term = lease_term
+        self.loan_term = loan_term
+        self.lease_down_pay_rate = lease_down_pay_rate
+        self.loan_down_pay_rate = loan_down_pay_rate
+        if is_lease:
+            self.lease_apr = lease_apr
+        if is_loan:
+            self.loan_apr = loan_apr
+    def get_lease_apr(self):
+        return self.lease_apr
+    def down_payment(self, total_price_with_options):
+        if self.is_lease:
+            self.dp = total_price_with_options * float(self.lease_down_pay_rate)
+        if self.is_loan:
+            self.dp = total_price_with_options * float(self.loan_down_pay_rate)
+        return self.dp
+    def monthly_installment(self, total_price_with_options):
+        if self.is_lease:
+            self.mi = (total_price_with_options)
+
+class Promotions:
+    def __init__(self, discount, new_lease_apr, new_loan_apr, term, vehicle_applied, promotion_end_date):
+        self.discount = discount
+        self.new_lease_apr = new_lease_apr
+        self.new_loan_apr = new_loan_apr
+        self.term = term
+        self.vehicle_applied = vehicle_applied
+        self.promotion_end_date = promotion_end_date
+    def __repr__(self):
+        if self.discount > 0:
+            return "Buying {vehicle_applied} by {promotion_end_date}, you will be getting a {discount} of discount.".format(vehicle_applied=self.vehicle_applied, promotion_end_date=self.promotion_end_date, discount=self.discount)
+        if (self.new_lease_apr > 0) and (self.new_lease_apr < Finance.get_lease_apr):
+            return "Buying {vehicle_applied} by {promotion_end_date}, you can lease your vehicle with a rate of {new_lease_apr} for {term} months.".format(vehicle_applied=self.vehicle_applied, promotion_end_date=self.promotion_end_date, new_lease_apr=self.new_lease_apr, installments=self.installments)
+        if (self.new_loan_apr > 0) and (self.new_loan_apr < loan.apr):
+            return "Buying {vehicle_applied} by {promotion_end_date}, you can finance your vehicle with a rate of {new_loan_apr} for {term} months.".format(vehicle_applied=self.vehicle_applied, promotion_end_date=self.promotion_end_date, new_loan_apr=self.new_loan_apr, installments=self.installments)
+    def application(self, discount, new_lease_apr, new_loan_apr):
+        if self.discount > 0:
+            price_to_pay_promo = price_to_pay - self.discount
+        if (new_lease_apr > 0) and (new_lease_apr < lease.apr):
+            lease.apr = new_lease_apr
+            lease.term = self.term
+        if (new_loan_apr > 0) and (new_loan_apr < loan.apr):
+            loan.apr = new_loan_apr
+            loan.term = self.term
+
+class Dealership:
     def __init__(self, name, make, address, phone_number):
         self.name = name
         self.make = make
@@ -119,21 +182,21 @@ class dealership:
     def __repr__(self):
         return "{name}, your reliable {make} dealer located at {address}. Contact us at {phone_number} for more details about our latest deals.".format(name=self.name, make=self.make, address=self.address, phone_number=self.phone_number)
 
-class listing(dealership):
+class Listing(Dealership):
     def __init__(self, name, make, address, phone_number, vehicle):
         super().__init__(name, make, address, phone_number)
         self.vehicle = vehicle
     def __repr__(self):
         return "%s." % (self.vehicle)
 
-class listing_used_vehicle(dealership):
+class UsedVehicleListing(Dealership):
     def __init__(self, name, make, address, phone_number, used_vehicle):
         super().__init__(name, make, address, phone_number)
         self.used_vehicle = used_vehicle
     def __repr__(self):
         return "%s." % (self.used_vehicle)
 
-class inventory(dealership):
+class Inventory(Dealership):
     def __init__(self, name, make, address, phone_number):
         super().__init__(name, make, address, phone_number)
         self.listings_vehicle = []
@@ -152,9 +215,7 @@ class inventory(dealership):
         for listing in self.listings_used_vehicle:
             print(listing)
 
-pre_delivery_inspection = 140000
-
-class part:
+class Part:
     def __init__(self, component, vehicle_used, status, price):
         self.component = component
         self.vehicle_used = vehicle_used
@@ -163,14 +224,14 @@ class part:
     def __repr__(self):
         return "{component} for {vehicle_used}, {status}, {price}.".format(component=self.component, vehicle_used=self.vehicle_used, status=self.status, price=self.price)
 
-class part_listing(dealership):
+class PartListing(Dealership):
     def __init__(self, name, make, address, phone_number, part):
         super().__init__(name, make, address, phone_number)
         self.part = part
     def __repr__(self):
         return "%s." % (self.part)
 
-class warehouse(dealership):
+class Warehouse(Dealership):
     def __init__(self, name, make, address, phone_number):
         super().__init__(name, make, address, phone_number)
         self.stored_parts = []
@@ -182,69 +243,14 @@ class warehouse(dealership):
         for part in self.stored_parts:
             print(part)
 
-class loan:
-    def __init__(self, apr, term, down_payment_percentage):
-        self.apr = apr
-        self.term = term
-        self.down_payment_percentage = down_payment_percentage
-        price_to_pay = int(vehicle.price.strip("¥")) + int(options.price.strip("¥")) + int(tax.environment_tax) + float(tax.weight_tax) + int(tax.displacement_tax) + int(insurance.policy_pricing) + int(freight + pre_delivery_inspection)
-    def down_payment(self, price_to_pay):
-        dp = self.down_payment_percentage * price_to_pay 
-        return dp
-    def monthly_installments(self, apr, term, price_to_pay):
-        mi = (price_to_pay * ((1 + apr) ** (term / 12)) - dp) / term
-        return mi
-
-class lease:
-    def __init__(self, apr, term, down_payment_percentage, residual_value_percentage):
-        self.apr = apr
-        self.term = term
-        self.down_payment_percentage = down_payment_percentage
-        self.residual_value_percentage = residual_value_percentage
-        price_to_pay = int(vehicle.price.strip("¥")) + int(options.price.strip("¥")) + int(tax.environment_tax) + float(tax.weight_tax) + int(tax.displacement_tax) + int(insurance.policy_pricing) + int(freight + pre_delivery_inspection)
-    def down_payment(self, price_to_pay):
-        self.dp = self.down_payment_percentage * price_to_pay
-        return self.dp
-    def residual_value(self, price_to_pay):
-        self.rv = self.residual_value_percentage * price_to_pay
-        return self.rv
-    def monthly_payment(self, apr, term, price_to_pay):
-        self.mp = (price_to_pay * ((1 + apr) ** (term / 12)) - self.dp - self.rv) / term
-        return self.mp
-
-class promos:
-    def __init__(self, discount, new_lease_apr, new_loan_apr, term, vehicle_applied, promotion_end_date):
-        self.discount = discount
-        self.new_lease_apr = new_lease_apr
-        self.new_loan_apr = new_loan_apr
-        self.term = term
-        self.vehicle_applied = vehicle_applied
-        self.promotion_end_date = promotion_end_date
-    def __repr__(self):
-        if self.discount > 0:
-            return "Buying {vehicle_applied} by {promotion_end_date}, you will be getting a {discount} of discount.".format(vehicle_applied=self.vehicle_applied, promotion_end_date=self.promotion_end_date, discount=self.discount)
-        if (self.new_lease_apr > 0) and (self.new_lease_apr < lease.apr):
-            return "Buying {vehicle_applied} by {promotion_end_date}, you can lease your vehicle with a rate of {new_lease_apr} for {term} months.".format(vehicle_applied=self.vehicle_applied, promotion_end_date=self.promotion_end_date, new_lease_apr=self.new_lease_apr, installments=self.installments)
-        if (self.new_loan_apr > 0) and (self.new_loan_apr < loan.apr):
-            return "Buying {vehicle_applied} by {promotion_end_date}, you can finance your vehicle with a rate of {new_loan_apr} for {term} months.".format(vehicle_applied=self.vehicle_applied, promotion_end_date=self.promotion_end_date, new_loan_apr=self.new_loan_apr, installments=self.installments)
-    def application(self, discount, new_lease_apr, new_loan_apr):
-        if self.discount > 0:
-            price_to_pay_promo = price_to_pay - self.discount
-        if (new_lease_apr > 0) and (new_lease_apr < lease.apr):
-            lease.apr = new_lease_apr
-            lease.term = self.term
-        if (new_loan_apr > 0) and (new_loan_apr < loan.apr):
-            loan.apr = new_loan_apr
-            loan.term = self.term
-
-class customer:
+class Customer:
     def __init__(self, name, request_at_the_desk):
         self.name = name
         self.request_at_the_desk = request_at_the_desk
     def __repr__(self):
         return "{name}, {request_at_the_desk}.".format(name=self.name, request_at_the_desk=self.request_at_the_desk)
 
-class buy_and_sell(customer):
+class Sales(Customer):
     def __init__(self, name, request_at_the_desk, make_inquiry, model_inquiry, budget):
         super().__init__(name, request_at_the_desk)
         self.make_inquiry = make_inquiry
@@ -281,7 +287,7 @@ class buy_and_sell(customer):
             new_used_listing = inventory.listing_used_vehicle(used_vehicle)
             inventory.add_used_listings(new_used_listing)
 
-class service(customer):
+class Service(Customer):
     def __init__(self, name, request_at_the_desk, mileage, serviced_before, previous_services, request):
         super().__init__(name, request_at_the_desk)
         self.mileage = mileage
@@ -294,7 +300,7 @@ class service(customer):
     def __repr__(self):
         return "{name}, {request}.".format(name=self.name, request=self.request)
 
-class repair(service, customer):
+class Repair(Service, Customer):
     def __init__(self, name, request_at_the_desk, mileage, serviced_before, previous_services, request, component_to_fix, purchase_date, repair_date):
         super().__init__(name, request_at_the_desk, mileage, serviced_before, previous_services, request)
         self.component_to_fix = component_to_fix
@@ -331,7 +337,7 @@ class repair(service, customer):
             elif ("synchronizers" in self.request == True):
                 self.human_hours += 6.0
             else:
-                if (self.repair_date - self.purchase_date <= warranty.year) or (self.mileage <= warranty.mileage):
+                if (self.repair_date - self.purchase_date <= Warranty.year) or (self.mileage <= Warranty.mileage):
                     part.price = 0
                 self.human_hours += 12.0
                 print("We need to swap a new transmission for you.")          
@@ -389,7 +395,7 @@ class repair(service, customer):
             if ("dashboard" in self.request == True):
                 self.human_hours += 3.0
             if ("infotainment system" in self.request == True):
-                self.human_hours += 5
+                self.human_hours += 5.0
             if ("tpms" in self.request == True):
                 self.human_hours += 1.5
             if ("air conditioning" in self.request == True):
@@ -404,7 +410,7 @@ class repair(service, customer):
     def final_pricing(self, part, human_hours):
         price = part.price + 5500.0 * human_hours
 
-class maintenance(service, customer):
+class Maintenance(Service, Customer):
     def __init__(self, name, request_at_the_desk, mileage, serviced_before, previous_services, request, mileage_before_service):
         super().__init__(name, request_at_the_desk, mileage, serviced_before, previous_services, request)
         self.mileage_before_service = mileage_before_service
@@ -438,18 +444,3 @@ class maintenance(service, customer):
         if (int(mileage_before_service) / 120000 >= 1) and (int(mileage_before_service) % 120000 >= 0) and (int(mileage_before_service) % 120000 <= 119999):
             self.price += part.price()
             self.human_hours += 8
-
-#gr_supra_rz = vehicle("2020", "Toyota", "GR Supra", "RZ", str(3.0), "1540kg", "170g/km", "Red", "¥7027778")
-#print(gr_supra_rz)
-#tm_chiyoda = dealership("Toyota Mobility Chiyoda", "Toyota", "2-1-4 Uchi-Kanda, Chiyoda, Tokyo, Tokyo 101-0047", "+81-3-3256-5351")
-#print(tm_chiyoda)
-#supra_jza80 = used_vehicle("1997", "Toyota", "Supra", "RZ", str(3.0), "1570kg", "N/A", "Silver", "¥4005000", "mint", "120000km", tm_chiyoda.name)
-#print(supra_jza80)
-#engine_warranty = warranty("engine", str(5), "100000km")
-#print(engine_warranty)
-#trunk_spoiler = options("GR Trunk Spoiler", "GR Supra", "¥220000")
-#print(trunk_spoiler)
-#forged_al_wheel = part("GR 19-in forged aluminium wheel", "GR Supra", "Stock", "¥704000")
-#print(forged_al_wheel)
-#kazu = customer("Kazuya", "buying a car")
-#print(kazu)
