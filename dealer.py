@@ -15,7 +15,8 @@ class Dealer:
     def __repr__(self):
         return "%s, %s, %s." % (self.name, self.address, self.phone_number)
 
-dealer_1 = Dealer("Toyota Mobility Chiyoda", "2-1-4 Uchi-Kanda, Chiyoda District, Tokyo, Tokyo, Japan 101-0047", "+81-3-3256-5351")
+dealer_1 = Dealer("Toyota Mobility Chiyoda", "2-1-4 Uchi-Kanda, Chiyoda District, Tokyo, Tokyo, Japan 101-0047", "+81-3-3256-5351"
+)
 
 class Client:
     def __init__(self, name, is_buyer, is_seller):
@@ -100,7 +101,13 @@ gr_supra_rz = Vehicle("2020", "Toyota", "GR Supra", "RZ", "3.0", "1540kg", "170g
 print(gr_supra_rz.total_price())
 
 class NewVehicleListing:
-    def __init__()
+    def __init__(self, vehicle, seller=Dealer):
+        self.vehicle = vehicle
+        self.seller = seller
+    def __repr__(self):
+        return "%s %s %s %s, %s." % (self.vehicle.year, self.vehicle.make, self.vehicle.model, self.vehicle.trim, self.seller)
+dealer_1_list = NewVehicleListing(gr_supra_rz, dealer_1)
+print(dealer_1_list)
 
 class UsedVehicle(Vehicle):
     def __init__(self, year, make, model, trim, displacement, weight, carbon_emission, color, price, condition, mileage, owner):
@@ -122,7 +129,7 @@ class Part:
         self.for_option = for_option
         self.price = price
     def __repr__(self):
-        return "%s for %s, %s, %s, %s, ¥%s." % .(self.name, self.vehicle_for_use, self.for_repair, self.for_maintenance, self.for_option self.price)          
+        return "%s for %s, %s, %s, %s, ¥%s." % (self.name, self.vehicle_for_use, self.for_repair, self.for_maintenance, self.for_option, self.price)          
     def get_price(self):
         return float(self.price)
 
@@ -139,7 +146,7 @@ class Insurance:
         self.pedestrian_injury = pedestrian_injury
         self.price = 0.0
 
-    def policy_pricing(self):
+    def policy_premium_pricing(self):
         if self.comprehensive_coverage == True:
             self.price += 20000.0
         if self.third_party_liability == "100000000":
@@ -148,9 +155,17 @@ class Insurance:
             self.price += 80000.0
         if self.collision == True:
             self.price += 50000.0
+        if self.deductable == "45000":
+            self.price += 30000.0
+        if self.deductable == "75000":
+            self.price += 40000.0
         if self.pedestrian_injury == True:
-            self.price += 70000.0
+            self.price += 40000.0
         return self.price
+
+ins_option_1 = Insurance(True, "100000000", True, "45000", True)
+ins_option_1_price = ins_option_1.policy_premium_pricing()
+print(ins_option_1_price)
 
 class Warranty:
 
@@ -163,6 +178,7 @@ class Warranty:
         return "The warranty for {component} is {year} years or {mileage}, whichever comes earlier.".format(component=self.component, year=self.year, mileage=self.mileage)
 
 engine_warranty = Warranty("engine", "5 year", "100000km")
+whole_car_warranty = Warranty("whole_vehicle", "3 year", "60000km")
 
 class WarrantyList:
     def __init__(self, warranty):
