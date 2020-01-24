@@ -27,6 +27,7 @@ class Client:
         return "%s, %s, %s." % (self.name, self.is_buyer, self.is_seller)
 
 sato = Client("Sato", False, True)
+matsumoto = Client("Matsumoto", False, True)
 
 class Vehicle:
     def __init__(self, year, make, model, trim, displacement, weight, carbon_emission, color, price):
@@ -98,7 +99,7 @@ class Vehicle:
         return self.price_total
 
 gr_supra_rz = Vehicle("2020", "Toyota", "GR Supra", "RZ", "3.0", "1540kg", "170g/km", "Red", "7027778")
-print(gr_supra_rz.total_price())
+
 
 class NewVehicleListing:
     def __init__(self, vehicle, seller=Dealer):
@@ -119,6 +120,7 @@ class UsedVehicle(Vehicle):
         return "{year} {make} {model} {trim}, {displacement}, {weight}, {carbon_emission}, {color}, ¥{price}, {condition}, {mileage}, {owner}.".format(year=self.year, make=self.make, model=self.model, trim=self.trim, displacement=self.displacement, weight=self.weight, carbon_emission=self.carbon_emission, color=self.color, price=self.price, condition=self.condition, mileage=self.mileage, owner=self.owner)
 
 supra_jza80 = UsedVehicle("1997", "Toyota", "Supra", "RZ", "3.0", "1570kg", "N/A", "Silver", "4005000", "mint", "140000km", dealer_1)
+matsumotos_car = UsedVehicle("2007", "Toyota", "Prius", "S 10th Anniversary Edition", "1.5", "1317kg", "N/A", "Silver", "444000", "mint", "58000km", matsumoto)
 
 class Part:
     def __init__(self, name, vehicle_for_use, for_repair, for_maintenance, for_option, price):
@@ -186,44 +188,62 @@ class WarrantyList:
     def __repr__(self):
         return "%s, %s or %s." % (self.warranty.component, self.warranty.year, self.warranty.mileage)
 
+warranty_list1 = WarrantyList(whole_car_warranty)
+
 #Both Finance and Promotion classes need to be fixed and simulate real car financing situations. Need more research.
 #Might need to consider merging Finance class and Promotion class into a single class, or set up Promotion class as a sub class of Finance class.
 
 class Finance:
-    def __init__(self, is_lease, is_loan, lease_apr, loan_apr, lease_term, loan_term, lease_down_pay_rate, loan_down_pay_rate):
-        self.is_lease = is_lease
-        self.is_loan = is_loan
-        self.lease_apr = lease_apr
+    def __init__(self, loan_apr, loan_term, loan_down_pay_rate, price):
         self.loan_apr = loan_apr
-        self.lease_term = lease_term
         self.loan_term = loan_term
-        self.lease_down_pay_rate = lease_down_pay_rate
         self.loan_down_pay_rate = loan_down_pay_rate
-        if is_lease:
-            self.lease_apr = lease_apr
-        else: 
-            self.lease_apr = "Cash"
-        if is_loan:
-            self.loan_apr = loan_apr
-        else:
-            self.loan_apr = "Cash"
-
-    def get_lease_apr(self):
-        return self.lease_apr
-    def get_loan_apr(self):
-        return self.loan_apr
-    def get_lease_term(self):
-        return self.lease_term
-    def get_loan_term(self):
-        return self.loan_term
-    def down_payment(self, total_price_with_options):
-        if self.is_lease:
-            self.dp = total_price_with_options * float(self.lease_down_pay_rate)
-        if self.is_loan:
-            self.dp = total_price_with_options * float(self.loan_down_pay_rate)
+        self.price = price
+    def down_payment(self, price, loan_down_pay_rate):
+        self.dp = self.price * self.loan_down_pay_rate
         return self.dp
-    def monthly_installment(self, total_price_with_options):
-        pass
+    def monthly_installment(self, price):
+        self.mi = (self.price - self.dp) * ((self.loan_apr / 1200.0) * (1.0 + self.loan_apr / 1200.0) ** self.loan_term) / (((1.0 + self.loan_apr / 1200.0) ** self.loan_term) - 1.0)
+        return self.mi
+
+finance_op1 = Finance(4.8, 60.0, 0.30, gr_supra_rz.total_price())
+print(gr_supra_rz.total_price())
+dp1 = finance_op1.down_payment(gr_supra_rz.total_price(), 0.30)
+mi1 = finance_op1.monthly_installment(gr_supra_rz.total_price())
+print(dp1)
+print(mi1)
+
+class Lease:
+    def __init__(self, lease_apr, lease_term, lease_down_pay_rate, lease_residual_value_ratio, price, annual_mileage_allowance):
+        self.lease_apr = lease_apr
+        self.lease_term = lease_term
+        self.lease_down_pay_rate = lease_down_pay_rate
+        self.lease_residual_value_ratio = lease_residual_value_ratio
+        self.price = price
+        self.annual_mileage_allowance = annual_mileage_allowance
+    def down_payment(self, price, lease_down_pay_rate):
+        self.lease_dp = self.price * self.lease_down_pay_rate
+        return self.lease_dp
+    def residual_value(self, price, lease_residual_value_ratio, annual_mileage_allowance):
+        self.lease_rv = self.price * self.lease_residual_value_ratio
+        if self.annual_mileage_allowance >= 24000.0:
+            self.lease_rv = self.price * self.lease_residual_value_ratio - (self.annual_mileage_allowance - 24000.0) * 15.0
+        return self.lease_rv
+    def money_factor(self, lease_apr):
+        self.mf = self.lease_apr / 2400.0
+        return self.mf
+    def monthly_depreciation_payment(self, price, lease_rv, lease_term):
+        self.mdp = (self.price - self.lease_rv) / self.lease_term
+        return self.mdp
+    def monthly_financial_charges(self, price, lease_rv, mf):
+        self.mfc = (self.price + self.lease_rv) * self.mf
+        return self.mfc
+    def monthly_payment(self, mdp, mfc):
+        self.mp = self.mdp + self.mfc
+        return self.mp
+
+lease_op1 = Lease(4.8, 60.0, 0.25, 0.34, gr_supra_rz.total_price, 24025.0)
+
 
 class Promotions:
     def __init__(self, discount, new_lease_apr, new_loan_apr, new_lease_term, new_loan_term, vehicle_applied, promotion_end_date):
@@ -250,8 +270,6 @@ class Promotions:
         if (self.new_loan_apr > 0) and (self.new_loan_apr < Finance.get_loan_apr):
             Finance.get_loan_apr = self.new_loan_apr
             Finance.get_loan_term = self.new_loan_term
-
-
 
 
 class Maintenance:
