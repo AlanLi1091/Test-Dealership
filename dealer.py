@@ -222,7 +222,7 @@ class Lease:
         self.price = price
         self.annual_mileage_allowance = annual_mileage_allowance
     def down_payment(self, price, lease_down_pay_rate):
-        self.lease_dp = self.price * self.lease_down_pay_rate
+        self.lease_dp = float(self.price) * self.lease_down_pay_rate
         return self.lease_dp
     def residual_value(self, price, lease_residual_value_ratio, annual_mileage_allowance):
         self.lease_rv = self.price * self.lease_residual_value_ratio
@@ -238,11 +238,17 @@ class Lease:
     def monthly_financial_charges(self, price, lease_rv, mf):
         self.mfc = (self.price + self.lease_rv) * self.mf
         return self.mfc
-    def monthly_payment(self, mdp, mfc):
+    def monthly_payment(self):
         self.mp = self.mdp + self.mfc
         return self.mp
 
-lease_op1 = Lease(4.8, 60.0, 0.25, 0.34, gr_supra_rz.total_price, 24025.0)
+lease_op1 = Lease(4.8, 60.0, 0.25, 0.34, gr_supra_rz.total_price(), 24025.0)
+gr_dp_lease = lease_op1.down_payment(gr_supra_rz.total_price(), 0.25)
+gr_rv = lease_op1.residual_value(gr_supra_rz.total_price(), 0.34, 24025.0)
+gr_mf = lease_op1.money_factor(4.8)
+print(gr_dp_lease)
+print(gr_rv)
+print(gr_mf)
 
 
 class Promotions:
