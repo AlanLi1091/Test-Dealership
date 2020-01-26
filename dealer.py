@@ -1,4 +1,4 @@
-#Due Saturday, Jan 25, 2020 at 0:00AM
+# Overdue
 
 # The problems to be solved:
 # 1. Figure out the formula for lease and finance.
@@ -224,6 +224,9 @@ class Lease:
     def down_payment(self, price, lease_down_pay_rate):
         self.lease_dp = float(self.price) * self.lease_down_pay_rate
         return self.lease_dp
+    def capitalized_cost(self, price):
+        self.cc = self.price - self.lease_dp
+        return self.cc
     def residual_value(self, price, lease_residual_value_ratio, annual_mileage_allowance):
         self.lease_rv = self.price * self.lease_residual_value_ratio
         if self.annual_mileage_allowance >= 24000.0:
@@ -232,11 +235,11 @@ class Lease:
     def money_factor(self, lease_apr):
         self.mf = self.lease_apr / 2400.0
         return self.mf
-    def monthly_depreciation_payment(self, price, lease_rv, lease_term):
-        self.mdp = (self.price - self.lease_rv) / self.lease_term
+    def monthly_depreciation_payment(self, cc, lease_rv, lease_term):
+        self.mdp = (self.cc - self.lease_rv) / self.lease_term
         return self.mdp
-    def monthly_financial_charges(self, price, lease_rv, mf):
-        self.mfc = (self.price + self.lease_rv) * self.mf
+    def monthly_financial_charges(self, cc, lease_rv, mf):
+        self.mfc = (self.cc + self.lease_rv) * self.mf
         return self.mfc
     def monthly_payment(self):
         self.mp = self.mdp + self.mfc
@@ -246,10 +249,13 @@ lease_op1 = Lease(4.8, 60.0, 0.25, 0.34, gr_supra_rz.total_price(), 24025.0)
 gr_dp_lease = lease_op1.down_payment(gr_supra_rz.total_price(), 0.25)
 gr_rv = lease_op1.residual_value(gr_supra_rz.total_price(), 0.34, 24025.0)
 gr_mf = lease_op1.money_factor(4.8)
+gr_mdp = lease_op1.monthly_depreciation_payment(lease_op1.capitalized_cost(gr_supra_rz.total_price()), gr_rv, 60.0)
+gr_mfc = lease_op1.monthly_financial_charges(lease_op1.capitalized_cost(gr_supra_rz.total_price()), gr_rv, gr_mf)
+gr_mp = lease_op1.monthly_payment()
 print(gr_dp_lease)
 print(gr_rv)
 print(gr_mf)
-
+print(gr_mp)
 
 class Promotions:
     def __init__(self, discount, new_lease_apr, new_loan_apr, new_lease_term, new_loan_term, vehicle_applied, promotion_end_date):
