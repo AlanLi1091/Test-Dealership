@@ -59,21 +59,37 @@ class Client:
     def sell_car(self, used_vehicle):
         if self.is_seller == True:
             if used_vehicle.owner == self:
-                new_used_listing = UsedVehicleListing(used_vehicle)
+                new_used_listing = UsedVehicleListing(used_vehicle, self)
                 dealer_1.add_used_listing(new_used_listing)
         else:
             dealer_1.add_used_listing(new_used_listing)
-#following section is wip
-    # def buy_car(self, vehicle):
-    #     if self.is_buyer == True:
-    #         pass
+    def buy_car(self, vehicle):
+        if self.is_buyer == True:
+           dealer_listing = None
+           for listing in dealer_1.listings:
+                if listing.vehicle == vehicle:
+                   dealer_listing = listing
+                   break
+                if dealer_listing != None:
+                    dealer_listing.vehicle.owner = self
+                    dealer_1.remove_listing(dealer_listing)
+    def buy_used_car(self, used_vehicle):
+        if self.is_buyer == True:
+            dealer_used_listing = None
+            for listing in dealer_1.used_listings:
+                if listing.used_vehicle == used_vehicle:
+                    dealer_used_listing = listing
+                    break
+            if dealer_used_listing != None:
+                dealer_used_listing.used_vehicle.owner = self
+                dealer_1.remove_listing(dealer_used_listing)
 
 sato = Client("Sato", False, True, datetime.datetime(1997, 3, 29), "Gold", False)
 matsumoto = Client("Matsumoto", False, True, datetime.datetime(2010, 7, 13), "Blue", True)
 takahashi = Client("Takahashi", True, False, datetime.datetime(2019, 1, 24), "Green", False)
 
 class Vehicle:
-    def __init__(self, year, make, model, trim, displacement, weight, carbon_emission, color, price):
+    def __init__(self, year, make, model, trim, displacement, weight, carbon_emission, color, price, discount, end_date):
         self.year = year
         self.make = make
         self.model = model
@@ -83,9 +99,13 @@ class Vehicle:
         self.carbon_emission = carbon_emission
         self.color = color
         self.price = price
+        self.discount = discount
+        self.end_date = end_date
         self.tax_amount = 0.0
     def __repr__(self):
-        return "{year} {make} {model} {trim}, {displacement}, {weight}, {carbon_emission}, {color}, ¥{price}, ."
+        if self.discount > 0.0:
+            return "This vehicle has a ¥%s discount by the end of %s." % (self.discount, self.end_date.date)
+        return "{year} {make} {model} {trim}, {displacement}, {weight}, {carbon_emission}, {color}, ¥{price}."
     def environment_tax(self):
         if self.carbon_emission != "N/A":
             carbon_emission_value = int(self.carbon_emission.strip("g/km"))
@@ -134,6 +154,10 @@ class Vehicle:
         else:
             self.dt = 210000.0
         return self.dt
+    def apply_discount(self):
+        if self.discount > 0.0:
+            self.price = self.price - self.discount
+            return self.price
     def total_tax_amount(self):
         self.tax_amount = self.environment_tax() + self.weight_tax(self.price) + self.displacement_tax()
         return self.tax_amount
@@ -141,9 +165,9 @@ class Vehicle:
         self.price_total = self.total_tax_amount() + float(self.price) + float(freight) + float(pre_delivery_inspection)
         return self.price_total
 
-gr_supra_rz = Vehicle("2020", "Toyota", "GR Supra", "RZ", "3.0", "1540kg", "170g/km", "Red", "7027778")
-corolla_sport1 = Vehicle("2020", "Toyota", "Corolla Sport", "HYBRID G", "1.8", "1370kg", "83g/km", "White", "2659800")
-alphard_hybrid_sr_c_pack = Vehicle("2020", "Toyota", "Alphard", "HYBRID SR C Package 7-seater", "2.5", "2190kg", "N/A", "White", "5654000")
+gr_supra_rz = Vehicle("2020", "Toyota", "GR Supra", "RZ", "3.0", "1540kg", "170g/km", "Red", "7027778", None, None)
+corolla_sport1 = Vehicle("2020", "Toyota", "Corolla Sport", "HYBRID G", "1.8", "1370kg", "83g/km", "White", "2659800", None, None)
+alphard_hybrid_sr_c_pack = Vehicle("2020", "Toyota", "Alphard", "HYBRID SR C Package 7-seater", "2.5", "2190kg", "N/A", "White", "5654000", None, None)
 
 class NewVehicleListing:
     def __init__(self, vehicle, seller=Dealer):
@@ -156,24 +180,27 @@ dealer_1_inventory = NewVehicleListing(gr_supra_rz, dealer_1)
 print(dealer_1_inventory)
 
 class UsedVehicle(Vehicle):
-    def __init__(self, year, make, model, trim, displacement, weight, carbon_emission, color, price, condition, mileage, owner):
-        super().__init__(year, make, model, trim, displacement, weight, carbon_emission, color, price)
+    def __init__(self, year, make, model, trim, displacement, weight, carbon_emission, color, price, discount, end_date, condition, mileage, owner):
+        super().__init__(year, make, model, trim, displacement, weight, carbon_emission, color, price, discount, end_date)
         self.condition = condition
         self.mileage = mileage
         self.owner = owner
     def __repr__(self):
         return "{year} {make} {model} {trim}, {displacement}, {weight}, {carbon_emission}, {color}, ¥{price}, {condition}, {mileage}, {owner}.".format(year=self.year, make=self.make, model=self.model, trim=self.trim, displacement=self.displacement, weight=self.weight, carbon_emission=self.carbon_emission, color=self.color, price=self.price, condition=self.condition, mileage=self.mileage, owner=self.owner)
 
-supra_jza80 = UsedVehicle("1997", "Toyota", "Supra", "RZ", "3.0", "1570kg", "N/A", "Silver", "4005000", "mint", "140000km", dealer_1)
-matsumotos_car = UsedVehicle("2007", "Toyota", "Prius", "S 10th Anniversary Edition", "1.5", "1317kg", "N/A", "Silver", "444000", "mint", "58000km", matsumoto)
+supra_jza80 = UsedVehicle("1997", "Toyota", "Supra", "RZ", "3.0", "1570kg", "N/A", "Silver", "4005000", None, None, "mint", "140000km", dealer_1)
+matsumotos_car = UsedVehicle("2007", "Toyota", "Prius", "S 10th Anniversary Edition", "1.5", "1317kg", "N/A", "Silver", "444000", None, None, "mint", "58000km", matsumoto)
+
 
 class UsedVehicleListing:
-    def __init__(self, used_vehicle):
+    def __init__(self, used_vehicle, client):
         self.used_vehicle = used_vehicle
+        self.client = client
     def __repr__(self):
         return "%s %s %s %s, %s." % (self.used_vehicle.year, self.used_vehicle.make, self.used_vehicle.model, self.used_vehicle.trim, self.used_vehicle.owner)
 
-dealer_1_used_inventory = UsedVehicleListing(supra_jza80)
+dealer_1_used_inventory = UsedVehicleListing(supra_jza80, dealer_1)
+matsumoto.sell_car(matsumotos_car)
 
 class Part:
     def __init__(self, name, vehicle_for_use, status, use, price, labour_hours):
@@ -262,15 +289,24 @@ class WarrantyList:
 warranty_list1 = WarrantyList(whole_car_warranty)
 
 class Finance:
-    def __init__(self, loan_apr, loan_term, loan_down_pay_rate, price):
+    def __init__(self, loan_apr, loan_term, loan_down_pay_rate, price, bonus, end_date):
         self.loan_apr = loan_apr
         self.loan_term = loan_term
         self.loan_down_pay_rate = loan_down_pay_rate
         self.price = price
+        self.bonus = bonus
+        self.end_date = end_date
+    def __repr__(self):
+        if self.end_date != None:
+            return "This finance option will end at %s." % (self.end_date)
     def get_loan_apr(self):
         return self.loan_apr
     def get_loan_term(self):
         return self.loan_term
+    def apply_bonus(self):
+        if self.bonus > 0.0:
+            self.price = self.price - self.bonus
+        return self.price
     def get_loan_down_pay_rate(self):
         return self.loan_down_pay_rate
     def down_payment(self, price, loan_down_pay_rate):
@@ -281,7 +317,8 @@ class Finance:
         return self.mi
     
 
-finance_op1 = Finance(4.8, 60.0, 0.30, gr_supra_rz.total_price())
+finance_op1 = Finance(4.8, 60.0, 0.30, gr_supra_rz.total_price(), None, None)
+finance_op2 = Finance(1.99, 60.0, 0.0, corolla_sport1.total_price(), 150000.0, datetime.datetime(2020, 3, 31, 23, 59))
 print(gr_supra_rz.total_price())
 dp1 = finance_op1.down_payment(gr_supra_rz.total_price(), 0.30)
 mi1 = finance_op1.monthly_installment(gr_supra_rz.total_price())
@@ -289,13 +326,18 @@ print(dp1)
 print(mi1)
 
 class Lease:
-    def __init__(self, lease_apr, lease_term, lease_down_pay_rate, lease_residual_value_ratio, price, annual_mileage_allowance):
+    def __init__(self, lease_apr, lease_term, lease_down_pay_rate, lease_residual_value_ratio, price, annual_mileage_allowance, bonus, end_date):
         self.lease_apr = lease_apr
         self.lease_term = lease_term
         self.lease_down_pay_rate = lease_down_pay_rate
         self.lease_residual_value_ratio = lease_residual_value_ratio
         self.price = price
         self.annual_mileage_allowance = annual_mileage_allowance
+        self.bonus = bonus
+        self.end_date = end_date
+    def __repr__(self):
+        if self.end_date != None:
+            return "This lease option will end at %s." % (self.end_date)
     def get_lease_apr(self):
         return self.lease_apr
     def get_lease_term(self):
@@ -304,6 +346,10 @@ class Lease:
         return self.lease_down_pay_rate
     def get_lease_residual_value_ratio(self):
         return self.lease_residual_value_ratio
+    def apply_bonus(self):
+        if self.bonus > 0.0:
+            self.price = self.price - self.bonus
+        return self.price
     def down_payment(self, price, lease_down_pay_rate):
         self.lease_dp = float(self.price) * self.lease_down_pay_rate
         return self.lease_dp
@@ -328,7 +374,8 @@ class Lease:
         self.mp = self.mdp + self.mfc
         return self.mp
 
-lease_op1 = Lease(4.8, 60.0, 0.25, 0.34, gr_supra_rz.total_price(), 24025.0)
+lease_op1 = Lease(4.8, 60.0, 0.25, 0.34, gr_supra_rz.total_price(), 24025.0, None, None)
+lease_op2 = Lease(1.99, 72.0, 0.0, 0.409, corolla_sport1.total_price(), 20000.0, 75000.0, datetime.datetime(2020, 3, 31, 23, 59))
 gr_dp_lease = lease_op1.down_payment(gr_supra_rz.total_price(), 0.25)
 gr_rv = lease_op1.residual_value(gr_supra_rz.total_price(), 0.34, 24025.0)
 gr_mf = lease_op1.money_factor(4.8)
@@ -340,45 +387,33 @@ print(gr_rv)
 print(gr_mf)
 print(gr_mp)
 
-class Promotions:
-    def __init__(self, discount, new_lease_apr, new_loan_apr, new_lease_term, new_loan_term, vehicle_applied, promotion_end_date):
-        self.discount = discount
-        self.new_lease_apr = new_lease_apr
-        self.new_loan_apr = new_loan_apr
-        self.new_lease_term = new_lease_term
-        self.new_loan_term = new_loan_term
-        self.vehicle_applied = vehicle_applied
-        self.promotion_end_date = promotion_end_date
-    def __repr__(self):
-        pass
-    def apply_discount(self, discount):
-        if self.discount > 0:
-            self.price_with_promo = self.vehicle_applied.total_price() - self.discount
-        return self.price_with_promo
-    def apply_lease_promo(self, new_lease_apr, new_lease_term):
-        if (self.new_lease_apr > Lease.get_lease_apr()) and (self.new_lease_term != Lease.get_lease_term()):
-            pass
-
-promo1 = Promotions("200000", None, None, None, None, gr_supra_rz, datetime.datetime(2020, 3, 31, 23, 59))
-promo2 = Promotions(None, 3.9, None, 72.0, None, corolla_sport1, datetime.datetime(2020, 2, 29, 23, 59))
-promo3 = Promotions(None, None, 2.9, None, 60.0, alphard_hybrid_sr_c_pack, datetime.datetime(2020, 3, 31, 23, 59))
-
-
 class Maintenance:
-    def __init__(self, name, price, labour_hours, mileage_required):
+    def __init__(self, name, price, labour_hours, first_service_mileage, subsequent_service_mileage):
         self.name = name
         self.price = price
         self.labour_hours = labour_hours
-        self.mileage_required = mileage_required
+        self.first_service_mileage = first_service_mileage
+        self.subsequent_service_mileage = subsequent_service_mileage
     def __repr__(self):
-        return "{name}, ¥{price}, {labour_hours} human hours needed for maintenance, every {mileage_required}kms.".format(name=self.name, price=self.price, labour_hours=self.labour_hours, mileage_required=self.mileage_required)
+        return """{name}, ¥{price}, {labour_hours} human hours needed for maintenance.
+        First service at {first_service_mileage}kms and subsequent service for every {subsequent_service_mileage}kms.""".format(name=self.name, price=self.price, labour_hours=self.labour_hours, first_service_mileage=self.first_service_mileage, subsequent_service_mileage=self.subsequent_service_mileage)
     def get_labour_hours(self):
         return self.labour_hours
-    def get_mileage_required(self):
-        return self.mileage_required
+    def get_first_service_mileage(self):
+        return self.first_service_mileage
+    def get_subsequent_service_mileage(self):
+        return self.subsequent_service_mileage
+    
 
-service1 = Maintenance("Service 1", str(int(50455.0)), str(6.0), str(int(8000.0)))
-service2 = Maintenance("Service 2", str(int(63799.0)), str(8.0), str(int(16000.0)))
+service1 = Maintenance("Service 1", str(int(50455.0)), str(3.0), str(int(8000.0)), str(int(16000.0)))
+service2 = Maintenance("Service 2", str(int(63799.0)), str(4.0), str(int(16000.0)), str(int(32000.0)))
+service3 = Maintenance("Service 3", str(int(82288.0)), str(5.0), str(int(32000.0)), str(int(32000.0)))
+brake_fluid_replacement = Maintenance("Brake Fluid Replacement", str(int(23920.0)), str(1.5), str(int(48000.0)), str(int(48000.0)))
+engine_coolant_replacement = Maintenance("Engine Coolant Replacement", str(int(47673.0)), str(2.0), str(int(160000.0)), str(int(160000.0)))
+spark_plug_replacement = Maintenance("Spark Plug Replacement", str(int(38772.0)), str(int(2.0)), str(int(200000.0)), str(int(200000.0)))
+list_of_regular_service = [service1, service2, service3] 
+list_of_regular_replacement = [brake_fluid_replacement, engine_coolant_replacement, spark_plug_replacement]
+print(list_of_regular_service[1+1])
 
 
 class Repair:
@@ -396,7 +431,7 @@ class Repair:
             print("Part out of stock.")
         self.labour_hours += float(self.part.labour_hours)
         if self.part.status == "In Stock":
-            if (float(self.mileage) < float(self.warranty.get_mileage())) and (self.date_of_purchase > (self.date_of_repair + relativedelta(year=-int(Warranty.get_year())))):
+            if (float(self.mileage) < float(self.warranty.get_mileage())) and (self.date_of_purchase > (self.date_of_repair + relativedelta(year=-int(self.warranty.get_year())))):
                 self.part.price = 0.0
                 self.price += float(self.part.labour_hours) * 10454.0
             else:
@@ -407,17 +442,53 @@ class Repair:
 makoto_repair = Repair("Makoto", "58000", alphard_bumper, whole_car_warranty, datetime.date(2017, 12, 18), datetime.date.today())
 # delta1 = makoto_repair.date_of_repair+relativedelta(years=-3)
 # print(delta1)
-# following is wip
-class CustomerMaintenance:
-    def __init__(self, customer_look_for_service, mileage_before_service, maintenance, maintenancelist):
-        self.customer_look_for_service = customer_look_for_service
-        self.mileage_before_service = mileage_before_service
-        self.maintenance = maintenance
-        self.maintenancelist = maintenancelist
+
+class VehicleMaintenance:
+    def __init__(self, customer, current_mileage, serviced_before, parts_replaced_before, last_service_mileage, last_reg_part_replacement):
+        self.customer = customer
+        self.current_mileage = current_mileage
+        self.serviced_before = serviced_before
+        self.parts_replaced_before = parts_replaced_before
+        self.last_service_mileage = last_service_mileage
+        self.last_reg_part_replacement = last_reg_part_replacement
         self.price = 0.0
         self.labour_hours = 0.0
-        self.required_maintenance = []
-    def maintain_vehicle(self, customer_look_for_service):
-        for maintenance in self.maintenancelist.add_maintenance():
-            if (self.mileage_before_service / self.maintenance.get_mileage_required()).is_integer() == True:
-                self.required_maintenance.append(maintenance)
+        self.recommended_maintenance = []
+    def get_mileage_between_service(self):
+        if self.serviced_before == True:
+            self.mileage_between_service = self.current_mileage - self.last_service_mileage
+        return self.mileage_between_service
+    def get_last_reg_part_replacement(self):
+        if self.parts_replaced_before == True:
+            self.mileage_between_reg_part_replacement = self.current_mileage - self.last_reg_part_replacement
+        return self.mileage_between_reg_part_replacement
+    def determine_service_content(self):
+        if self.serviced_before == False:
+            for i in range(0, len(list_of_regular_service)):
+                if (float(self.current_mileage) - float(list_of_regular_service[i].get_first_service_mileage()) > 0.0) and \
+                     (float(self.current_mileage) - float(list_of_regular_service[i+1].get_first_service_mileage()) < 0.0):
+                    self.recommended_maintenance.append(list_of_regular_service[i])
+                else:
+                    self.recommended_maintenance.append(list_of_regular_service[2])
+                    for i in range(0, len(list_of_regular_replacement)):
+                        if (float(self.current_mileage) - float(list_of_regular_replacement[i].get_first_service_mileage()) > 0.0):
+                            self.recommended_maintenance.append(list_of_regular_replacement[i])
+        if (self.serviced_before == True) and (float(self.current_mileage) > 8000.0):
+            if float(self.mileage_between_service) > 8000.0:
+                for i in range(0, len(list_of_regular_service)):
+                    for j in range(0.0, 99.0):
+                        if (float(self.current_mileage) - float(list_of_regular_service[i].get_first_service_mileage()) + j * float(list_of_regular_service[i].get_subsequent_service_mileage())) > 0.0 \
+                            and (float(self.current_mileage) - float(list_of_regular_service[i].get_first_service_mileage()) + j * float(list_of_regular_service[i].get_subsequent_service_mileage())) \
+                                < float(list_of_regular_service[i].get_subsequent_service_mileage()):
+                            self.recommended_maintenance.append(list_of_regular_service[i])
+        if (self.parts_replaced_before == True) and (float(self.current_mileage) > 48000.0):
+            for i in range(0, len(list_of_regular_replacement)):
+                if float(self.mileage_between_reg_part_replacement) > float(list_of_regular_replacement[i].get_subsequent_service_mileage()):
+                    for j in range(0.0, 99.0):
+                        if ((float(self.current_mileage) // j * float(list_of_regular_replacement[i].get_subsequent_service_mileage())) == 1) and \
+                            ((float(self.current_mileage) // (j + 1) * float(list_of_regular_replacement[i].get_subsequent_service_mileage())) == 0):
+                            self.recommended_maintenance.append(list_of_regular_replacement[i])
+        return self.recommended_maintenance
+    def pricing(self):
+        pass
+            
