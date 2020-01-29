@@ -1,8 +1,5 @@
 # Overdue
 
-# The problems to be solved:
-# 1. Figure out a mechanism to replace an older value with a new value (ex. replace non-promo rate with promo rate).
-# 2. Work on a list of maintenance.
 import datetime
 from datetime import timedelta
 from dateutil.relativedelta import relativedelta
@@ -40,7 +37,8 @@ class Dealer:
     def remove_used_listing(self, sold_used_listing):
         self.used_listings.remove(sold_used_listing)
         
-dealer_1 = Dealer("Toyota Mobility Chiyoda", "2-1-4 Uchi-Kanda, Chiyoda District, Tokyo, Tokyo, Japan 101-0047", "+81-3-3256-5351")
+dealer_1 = Dealer("Toyota Mobility Chiyoda", \
+    "2-1-4 Uchi-Kanda, Chiyoda District, Tokyo, Tokyo, Japan 101-0047", "+81-3-3256-5351")
 
 class Client:
     def __init__(self, name, is_buyer, is_seller, drivers_license_date, drivers_license_color, incident_record):
@@ -52,7 +50,8 @@ class Client:
         self.incident_record = incident_record
         
     def __repr__(self):
-        return "%s, %s, %s, %s, %s, %s." % (self.name, self.is_buyer, self.is_seller, self.drivers_license_date, self.drivers_license_color, self.incident_record)
+        return "%s, %s, %s, %s, %s, %s." % (self.name, self.is_buyer, self.is_seller, \
+            self.drivers_license_date, self.drivers_license_color, self.incident_record)
     
     def get_driver_license_date(self):
         return self.drivers_license_date
@@ -102,7 +101,8 @@ matsumoto = Client("Matsumoto", False, True, datetime.datetime(2010, 7, 13), "Bl
 takahashi = Client("Takahashi", True, False, datetime.datetime(2019, 1, 24), "Green", False)
 
 class Vehicle:
-    def __init__(self, year, make, model, trim, displacement, weight, carbon_emission, color, price, discount, end_date):
+    def __init__(self, year, make, model, trim, displacement, weight, \
+        carbon_emission, color, price, discount, end_date):
         self.year = year
         self.make = make
         self.model = model
@@ -185,9 +185,12 @@ class Vehicle:
         self.price_total = self.total_tax_amount() + float(self.price) + float(freight) + float(pre_delivery_inspection)
         return self.price_total
 
-gr_supra_rz = Vehicle("2020", "Toyota", "GR Supra", "RZ", "3.0", "1540kg", "170g/km", "Red", "7027778", None, None)
-corolla_sport1 = Vehicle("2020", "Toyota", "Corolla Sport", "HYBRID G", "1.8", "1370kg", "83g/km", "White", "2659800", None, None)
-alphard_hybrid_sr_c_pack = Vehicle("2020", "Toyota", "Alphard", "HYBRID SR C Package 7-seater", "2.5", "2190kg", "N/A", "White", "5654000", None, None)
+gr_supra_rz = Vehicle("2020", "Toyota", "GR Supra", "RZ", "3.0", \
+    "1540kg", "170g/km", "Red", "7027778", None, None)
+corolla_sport1 = Vehicle("2020", "Toyota", "Corolla Sport", "HYBRID G", "1.8", \
+    "1370kg", "83g/km", "White", "2659800", None, None)
+alphard_hybrid_sr_c_pack = Vehicle("2020", "Toyota", "Alphard", "HYBRID SR C Package 7-seater", \
+    "2.5", "2190kg", "N/A", "White", "5654000", None, None)
 
 class NewVehicleListing:
     def __init__(self, vehicle, seller=Dealer):
@@ -201,8 +204,10 @@ dealer_1_inventory = NewVehicleListing(gr_supra_rz, dealer_1)
 print(dealer_1_inventory)
 
 class UsedVehicle(Vehicle):
-    def __init__(self, year, make, model, trim, displacement, weight, carbon_emission, color, price, discount, end_date, condition, mileage, owner):
-        super().__init__(year, make, model, trim, displacement, weight, carbon_emission, color, price, discount, end_date)
+    def __init__(self, year, make, model, trim, displacement, weight, carbon_emission, \
+        color, price, discount, end_date, condition, mileage, owner):
+        super().__init__(year, make, model, trim, displacement, weight, \
+            carbon_emission, color, price, discount, end_date)
         self.condition = condition
         self.mileage = mileage
         self.owner = owner
@@ -214,7 +219,8 @@ class UsedVehicle(Vehicle):
                     carbon_emission=self.carbon_emission, color=self.color, price=self.price, condition=self.condition, \
                         mileage=self.mileage, owner=self.owner)
 
-supra_jza80 = UsedVehicle("1997", "Toyota", "Supra", "RZ", "3.0", "1570kg", "N/A", "Silver", "4005000", None, None, "mint", "140000km", dealer_1)
+supra_jza80 = UsedVehicle("1997", "Toyota", "Supra", "RZ", "3.0", "1570kg", "N/A", \
+    "Silver", "4005000", None, None, "mint", "140000km", dealer_1)
 matsumotos_car = UsedVehicle("2007", "Toyota", "Prius", "S 10th Anniversary Edition", "1.5", "1317kg", "N/A",\
      "Silver", "444000", None, None, "mint", "58000km", matsumoto)
 
@@ -370,7 +376,8 @@ print(dp1)
 print(mi1)
 
 class Lease:
-    def __init__(self, lease_apr, lease_term, lease_down_pay_rate, lease_residual_value_ratio, price, annual_mileage_allowance, bonus, end_date):
+    def __init__(self, lease_apr, lease_term, lease_down_pay_rate, lease_residual_value_ratio, \
+        price, annual_mileage_allowance, bonus, end_date):
         self.lease_apr = lease_apr
         self.lease_term = lease_term
         self.lease_down_pay_rate = lease_down_pay_rate
@@ -454,7 +461,8 @@ class Maintenance:
    
     def __repr__(self):
         return """{name}, ¥{price}, {labour_hours} human hours needed for maintenance.
-        First service at {first_service_mileage}kms and subsequent service for every {subsequent_service_mileage}kms.""". \
+        First service at {first_service_mileage}kms and subsequent service for every \
+            {subsequent_service_mileage}kms.""". \
             format(name=self.name, price=self.price, labour_hours=self.labour_hours, first_service_mileage=self.first_service_mileage, \
                 subsequent_service_mileage=self.subsequent_service_mileage)
     
@@ -507,12 +515,14 @@ class Repair:
                     self.price += float(self.part.price) + float(self.part.labour_hours) * 10454.0
         return self.labour_hours, self.price
 
-makoto_repair = Repair("Makoto", "58000", alphard_bumper, whole_car_warranty, datetime.date(2017, 12, 18), datetime.date.today())
+makoto_repair = Repair("Makoto", "58000", alphard_bumper, whole_car_warranty, \
+    datetime.date(2017, 12, 18), datetime.date.today())
 delta1 = makoto_repair.date_of_repair+relativedelta(years=-3)
 print(delta1)
 
 class VehicleMaintenance:
-    def __init__(self, customer, current_mileage, serviced_before, parts_replaced_before, last_service_mileage, last_reg_part_replacement):
+    def __init__(self, customer, current_mileage, serviced_before, \
+        parts_replaced_before, last_service_mileage, last_reg_part_replacement):
         self.customer = customer
         self.current_mileage = current_mileage
         self.serviced_before = serviced_before
