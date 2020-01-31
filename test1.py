@@ -521,143 +521,97 @@ print(delta1)
 
 class VehicleMaintenance:
     def __init__(self, customer, current_mileage, serviced_before, \
-        parts_replaced_before, last_service_mileage, last_reg_part_replacement, last_brake_replacement, \
-            last_engine_coolant_replacement, last_spark_plug_replacement):
+        parts_replaced_before, last_service_mileage, last_reg_part_replacement):
         self.customer = customer
         self.current_mileage = current_mileage
         self.serviced_before = serviced_before
         self.parts_replaced_before = parts_replaced_before
-        self.last_service_mileage = last_service_mileage
+        self.last_service_mileage = last_service_mileage 
         self.last_reg_part_replacement = last_reg_part_replacement
-        self.last_brake_replacement = last_brake_replacement
-        self.last_engine_coolant_replacement = last_engine_coolant_replacement
-        self.last_spark_plug_replacement = last_spark_plug_replacement
-        if self.serviced_before == False:
-            self.last_service_mileage == None
-            self.parts_replaced_before == False
-            self.last_reg_part_replacement == None
-        if (self.serviced_before == True) and (self.parts_replaced_before == False):
-            self.last_reg_part_replacement == None
-            self.last_brake_replacement == None
-            self.last_engine_coolant_replacement == None
-            self.last_spark_plug_replacement == None
         self.price = 0.0
         self.labour_hours = 0.0
+        self.content_of_last_replacement = []
         self.recommended_maintenance = []
-        self.mileage_between_service = 0.0
-        self.mileage_between_brake_replacement = 0.0
-        self.mileage_between_engine_coolant_replacement = 0.0
-        self.mileage_between_spark_plug_replacement = 0.0
-
+    
     def get_mileage_between_service(self):
         if self.serviced_before == True:
             self.mileage_between_service = self.current_mileage - self.last_service_mileage
         return self.mileage_between_service
-
-    def message(self):
-        if self.mileage_between_service > 10000.0:
-            print("This client needs service ASAP.")
     
-
-    def get_mileage_between_part_replacement(self):
+    def get_last_reg_part_replacement(self):
         if self.parts_replaced_before == True:
             self.mileage_between_reg_part_replacement = self.current_mileage - self.last_reg_part_replacement
-        return self.mileage_between_reg_part_replacement
-
-    def get_mileage_between_brake_replacement(self):
-        if (self.parts_replaced_before == True) and (self.last_brake_replacement != None):
-            self.mileage_between_brake_replacement = self.current_mileage - self.last_brake_replacement
-        return self.mileage_between_brake_replacement
+        return float(self.mileage_between_reg_part_replacement)
     
-    def get_mileage_between_engine_coolant_replacement(self):
-        if (self.parts_replaced_before == True) and (self.last_engine_coolant_replacement != None):
-            self.mileage_between_engine_coolant_replacement = self.current_mileage - self.last_engine_coolant_replacement
-        return self.mileage_between_engine_coolant_replacement
-
-    def get_mileage_between_spark_plug_replacement(self):
-        if (self.parts_replaced_before == True) and (self.last_spark_plug_replacement != None):
-            self.mileage_between_spark_plug_replacement = self.current_mileage - self.last_spark_plug_replacement
-        return self.mileage_between_spark_plug_replacement
+    # def get_content_of_last_replacement(self):
+    #     if self.parts_replaced_before == True:
+    #         for i in range(1, 99):
+    #             if (self.current_mileage >= 48000.0 * i) and (self.current_mileage < 48000.0 * (i + 1)):
+    #                 self.content_of_last_replacement = [list_of_regular_replacement[0]]
+    #             if (self.current_mileage >= 160000.0 * i) and (self.current_mileage < 160000.0 *(i + 1)):
+    #                 self.content_of_last_replacement.append(list_of_regular_replacement[1])
+    #     else:
+    #         self.content_of_last_replacement = []
+    #     return self.content_of_last_replacement
             
-    def first_service(self):
-        if (self.serviced_before == False) and (self.parts_replaced_before == False):
-            if (self.current_mileage >= 32000.0) and (self.current_mileage < 48000.0):
-                self.recommended_maintenance.append(list_of_regular_service[2])
-            elif (self.current_mileage >= 48000.0):
-                self.recommended_maintenance.append(list_of_regular_service[2])
-                for i in range(0, len(list_of_regular_replacement)):
-                    if (self.current_mileage > float(list_of_regular_replacement[i].get_first_service_mileage())):
-                        self.recommended_maintenance.append(list_of_regular_replacement[i])
-            else:
+
+    
+    def determine_service_content(self):
+        if self.serviced_before == False:
+            for i in range(0, len(list_of_regular_service)):
+                if (float(self.current_mileage) - float(list_of_regular_service[i].get_first_service_mileage()) > 0.0) and \
+                    (float(self.current_mileage) - float(list_of_regular_service[i+1].get_first_service_mileage()) < 0.0):
+                    self.recommended_maintenance = [list_of_regular_service[i]]
+                else:
+                    self.recommended_maintenance = [list_of_regular_service[2]]
+                break
+
+        if (self.serviced_before == True) and (float(self.current_mileage) >= 8000.0):
+            if float(self.get_mileage_between_service()) >= 8000.0:
                 for i in range(0, len(list_of_regular_service)):
-                    if self.current_mileage > float(list_of_regular_service[i].get_first_service_mileage()) \
-                        and self.current_mileage < float(list_of_regular_service[i+1].get_first_service_mileage()):
-                        self.recommended_maintenance.append(list_of_regular_service[i])
-        else:
-            pass
-        return self.recommended_maintenance
-        
+                    for j in range(1, 99):
+                        if (((float(self.current_mileage) - float(list_of_regular_service[i].get_first_service_mileage())) // \
+                            j * float(list_of_regular_service[i].get_subsequent_service_mileage())) == 1) \
+                            and ((float(self.current_mileage) - float(list_of_regular_service[i].get_first_service_mileage()) // \
+                            (j + 1) * float(list_of_regular_service[i].get_subsequent_service_mileage())) == 0):
+                            if (float(self.current_mileage) - (float(list_of_regular_service[i].get_first_service_mileage()) + \
+                                j * float(list_of_regular_service[i].get_subsequent_service_mileage())) > 0.0) and \
+                                (float(self.current_mileage) - (float(list_of_regular_service[i].get_first_service_mileage()) + \
+                                j * float(list_of_regular_service[i].get_subsequent_service_mileage())) < 8000.0):    
+                                self.recommended_maintenance = [list_of_regular_service[i]]
+                    break
 
-    def first_part_replacement(self):
-        if (self.serviced_before == True) and (self.parts_replaced_before == False):
-            n = self.current_mileage // 8000.0
-            if n in range(1, 999, 2):
-                self.recommended_maintenance.append(list_of_regular_service[0])
-            if n in range(2, 999, 4) or (self.mileage_between_service in range(12000, 24000)):
-                self.recommended_maintenance.append(list_of_regular_service[1])
-            if n in range(4, 999, 4) or (self.mileage_between_service >= 24000.0):
-                self.recommended_maintenance.append(list_of_regular_service[2])
-            if (self.current_mileage >= 48000.0):
-                for i in range(0, len(list_of_regular_replacement)):
-                    if (self.current_mileage > float(list_of_regular_replacement[i].get_first_service_mileage())):
-                        self.recommended_maintenance.append(list_of_regular_replacement[i])
-        else:
-            pass
-        return self.recommended_maintenance
-        
-    def regular_service(self):
-        if (self.serviced_before == True) and (self.parts_replaced_before == True):
-            n = self.current_mileage // 8000.0
-            if n in range(1, 999, 2):
-                self.recommended_maintenance.append(list_of_regular_service[0])
-            if n in range(2, 999, 4) or (self.mileage_between_service in range(12000, 24000)):
-                self.recommended_maintenance.append(list_of_regular_service[1])
-            if n in range(4, 999, 4) or (self.mileage_between_service >= 24000.0):
-                self.recommended_maintenance.append(list_of_regular_service[2])
-            if self.last_brake_replacement != None:
-                if self.mileage_between_brake_replacement >= 48000.0:
-                    self.recommended_maintenance.append(list_of_regular_replacement[0])
-            if self.last_engine_coolant_replacement != None:
-                if self.mileage_between_engine_coolant_replacement >= 160000.0:
-                    self.recommended_maintenance.append(list_of_regular_replacement[1])
-            if self.last_spark_plug_replacement != None: 
-                if self.mileage_between_spark_plug_replacement >= 200000.0:
-                    self.recommended_maintenance.append(list_of_regular_replacement[2])
-        else:
-            pass
-        return self.recommended_maintenance
+        if (self.parts_replaced_before == False):
+            for i in range(0, len(list_of_regular_replacement)):
+                if (float(self.current_mileage) > float(list_of_regular_replacement[i].get_first_service_mileage())):
+                    self.recommended_maintenance.append(list_of_regular_replacement[i])
+                break
 
+        if self.parts_replaced_before == True:
+            for i in range(0, len(list_of_regular_replacement)):
+                if (float(self.current_mileage) > float(list_of_regular_replacement[i].get_first_service_mileage())) \
+                    and (list_of_regular_replacement[i] not in self.content_of_last_replacement):
+                    for j in range(1, 99):
+                        if ((float(self.current_mileage) // j * float(list_of_regular_replacement[i].get_subsequent_service_mileage())) == 1) and \
+                            ((float(self.current_mileage) // (j + 1) * float(list_of_regular_replacement[i].get_subsequent_service_mileage())) == 0):
+                            self.recommended_maintenance.append(list_of_regular_replacement[i])
+                break
+        return self.recommended_maintenance
+   
     def total_labour_hours(self):
-        for i in (0, range(self.recommended_maintenance)):
+        for i in range(0, len(self.recommended_maintenance)):
             self.labour_hours += float(self.recommended_maintenance[i].get_labour_hours())
             break
         return self.labour_hours
     
     def total_price(self):
-        for i in (0, range(self.recommended_maintenance)):
+        for i in range(0, len(self.recommended_maintenance)):
             self.price += float(self.recommended_maintenance[i].get_pricing())
             self.total_pricing = self.labour_hours * 10454.0 + self.price
             break
         return self.price, self.total_pricing
-
-jack_service = VehicleMaintenance("Jack", 74520.0, True, True, 72211.0, 48001.7, 48001.7, None, None)
+jack_service = VehicleMaintenance("Jack", 74520.0, True, True, 72211.0, 48001.7)
 print(jack_service.get_mileage_between_service())
-print(jack_service.regular_service())
-
-kyle_service = VehicleMaintenance("Kyle", 33998.0, False, False, None, None, None, None, None)
-kyle_service_content = kyle_service.first_service()
-print(kyle_service_content)
-
-susan_service = VehicleMaintenance("Susan", 57091.0, True, False, 41229.0, None, None, None, None)
-susan_service_content = susan_service.first_part_replacement()
-print(susan_service_content)
+print(jack_service.get_last_reg_part_replacement())
+# print(jack_service.get_content_of_last_replacement())
+print(jack_service.determine_service_content())    
