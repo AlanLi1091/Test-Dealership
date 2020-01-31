@@ -2,9 +2,9 @@ import unittest
 from dealer import Vehicle
 
 
-test_car = Vehicle("2020", "Toyota", "GR Supra", "RZ", str(3.0), "1540kg", "170g/km", "Red", "¥7027778")
+test_car = Vehicle("2020", "Toyota", "GR Supra", "RZ", "3.0", "1540kg", "170g/km", "Red", "7027778", None, None)
 
-class Testtax(unittest.TestCase):
+class TestVehicle(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
@@ -23,7 +23,7 @@ class Testtax(unittest.TestCase):
     
     def test_environment_tax(self):
         print("test_environment_tax")
-        self.assertEqual(self.tax.environment_tax, 50000)
+        self.assertEqual(self.environment_tax(), 50000)
 
 if __name__ == '__main__':
     unittest.main()
